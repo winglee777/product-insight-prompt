@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>客户开品洞察 · 提示词生成器</title>
+<link href="https://fonts.font.im/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,500&family=Outfit:wght@400;500;600;700;800;900&family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@400;500;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5efe6;
+  --paper:#ffffff;
+  --ink:#1a1a1a;
+  --sub:#3a3a3a;
+  --mute:#7a7a7a;
+  --bd:#d8d2c4;
+  --bd-soft:#ebe6db;
+
+  --accent:#c2410c;
+  --accent-bg:#fef3e7;
+  --accent-2:#8b4513;
+  --gold:#b8860b;
+  --gold-bg:#fdf6e3;
+  --green:#2d6a4f;
+  --green-bg:#e8f3ee;
+  --red:#9b2c2c;
+
+  --code-bg:#1a1a1a;
+  --code-ink:#e8e6e3;
+  --code-key:#ffd966;
+  --code-str:#a3d9a5;
+  --code-comment:#8a8580;
+
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  font-family:"Noto Sans SC","PingFang SC",-apple-system,sans-serif;
+  background:var(--bg);color:var(--ink);
+  font-size:14px;line-height:1.6;letter-spacing:.01em;
+}
+
+/* === HERO === */
+.hero{
+  background:linear-gradient(135deg,#1a1a1a 0%,#3d2b1f 50%,#c2410c 130%);
+  color:#fff;padding:36px 56px 28px;
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'PROMPT';position:absolute;right:-20px;top:-20px;
+  font-family:'Fraunces',serif;font-style:italic;
+  font-size:140px;font-weight:900;
+  color:rgba(255,255,255,.04);line-height:1;letter-spacing:.05em;
+}
+.hero .eyebrow{
+  font-family:'Fraunces',serif;font-style:italic;
+  font-size:13px;color:#ffd966;font-weight:500;
+  letter-spacing:.15em;text-transform:uppercase;
+  margin-bottom:10px;position:relative;z-index:1;
+}
+.hero h1{
+  font-family:'Noto Serif SC',serif;
+  font-size:32px;font-weight:900;line-height:1.25;
+  margin-bottom:8px;position:relative;z-index:1;
+}
+.hero h1 .h{color:#ffd966;font-style:italic;font-family:'Fraunces',serif}
+.hero .lead{
+  font-size:13px;color:rgba(255,255,255,.85);
+  line-height:1.7;max-width:900px;
+  position:relative;z-index:1;
+}
+.hero .lead b{color:#ffd966;font-weight:700}
+
+/* === STEPS === */
+.steps{
+  display:flex;gap:0;
+  background:var(--paper);
+  border-bottom:1px solid var(--bd);
+  padding:0 56px;
+}
+.step{
+  flex:1;padding:14px 18px;
+  display:flex;align-items:center;gap:10px;
+  border-right:1px solid var(--bd-soft);
+  font-size:13px;
+}
+.step:last-child{border-right:0}
+.step .n{
+  width:24px;height:24px;
+  background:var(--accent);color:#fff;
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:'Outfit',sans-serif;font-weight:900;font-size:13px;
+  flex-shrink:0;
+}
+.step .t{color:var(--sub);font-weight:600}
+.step .t b{color:var(--ink);font-weight:900;display:block;font-size:14px;margin-bottom:2px}
+
+/* === MAIN LAYOUT === */
+.main{
+  display:grid;grid-template-columns:520px 1fr;
+  gap:0;min-height:calc(100vh - 220px);
+}
+.left{
+  background:var(--paper);
+  border-right:1px solid var(--bd);
+  padding:24px 32px;
+  overflow-y:auto;
+}
+.right{
+  background:#0d0d0d;
+  padding:24px 32px;
+  position:relative;
+  overflow-y:auto;
+}
+
+/* === FORM === */
+.section-hd{
+  display:flex;align-items:baseline;gap:10px;
+  margin:18px 0 12px;padding-bottom:8px;
+  border-bottom:1px solid var(--bd-soft);
+}
+.section-hd:first-child{margin-top:0}
+.section-hd .num{
+  font-family:'Fraunces',serif;font-style:italic;
+  font-size:22px;font-weight:900;color:var(--accent);
+}
+.section-hd .title{
+  font-family:'Noto Serif SC',serif;
+  font-size:14px;font-weight:900;
+}
+.section-hd .desc{
+  font-size:11px;color:var(--mute);margin-left:auto;
+}
+.field{margin-bottom:14px}
+.field label{
+  display:block;
+  font-size:12px;font-weight:700;color:var(--ink);
+  margin-bottom:5px;
+}
+.field label .req{color:var(--accent);margin-left:3px}
+.field label .opt{color:var(--mute);font-size:10px;font-weight:400;margin-left:5px}
+.field input,.field textarea,.field select{
+  width:100%;
+  padding:8px 12px;
+  font-family:inherit;font-size:13px;
+  background:#fafaf6;
+  border:1px solid var(--bd);
+  border-radius:3px;
+  color:var(--ink);
+  transition:border-color .2s, background .2s;
+}
+.field input:focus,.field textarea:focus,.field select:focus{
+  outline:none;
+  border-color:var(--accent);
+  background:#fff;
+}
+.field textarea{resize:vertical;min-height:60px;font-family:'JetBrains Mono','Noto Sans SC',monospace;font-size:12px}
+.field .hint{
+  font-size:11px;color:var(--mute);
+  margin-top:4px;line-height:1.5;
+}
+.field .hint b{color:var(--sub);font-weight:600}
+.field .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+.field .chip{
+  display:inline-block;padding:3px 9px;
+  font-size:11px;font-weight:600;
+  background:var(--accent-bg);color:var(--accent);
+  border-radius:2px;cursor:pointer;
+  transition:background .2s;
+  user-select:none;
+}
+.field .chip:hover{background:var(--accent);color:#fff}
+.field .chip.green{background:var(--green-bg);color:var(--green)}
+.field .chip.green:hover{background:var(--green);color:#fff}
+.field .chip.gold{background:var(--gold-bg);color:var(--gold)}
+.field .chip.gold:hover{background:var(--gold);color:#fff}
+
+/* === BUTTONS === */
+.btn-row{
+  display:flex;gap:10px;margin-top:20px;
+  padding-top:16px;border-top:1px solid var(--bd-soft);
+}
+.btn{
+  flex:1;padding:10px 16px;
+  font-family:inherit;font-size:13px;font-weight:700;
+  border:none;border-radius:3px;cursor:pointer;
+  transition:transform .1s, box-shadow .2s;
+  letter-spacing:.05em;
+}
+.btn:active{transform:translateY(1px)}
+.btn-primary{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(194,65,12,.3)}
+.btn-primary:hover{background:#9a3409}
+.btn-second{background:var(--paper);color:var(--ink);border:1px solid var(--bd)}
+.btn-second:hover{background:var(--bd-soft)}
+.btn-ghost{background:transparent;color:var(--mute);font-weight:600}
+.btn-ghost:hover{color:var(--accent)}
+
+/* === RIGHT PANE (PROMPT OUTPUT) === */
+.right-hd{
+  display:flex;align-items:center;justify-content:space-between;
+  padding-bottom:14px;
+  border-bottom:1px solid #2a2a2a;
+  margin-bottom:14px;
+}
+.right-hd .title{
+  font-family:'Noto Serif SC',serif;
+  font-size:15px;font-weight:900;color:#fff;
+}
+.right-hd .title .acc{color:#ffd966;font-style:italic;font-family:'Fraunces',serif}
+.right-hd .meta{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;color:#888;
+}
+.right-hd .meta b{color:#ffd966}
+
+.copy-btn{
+  background:#ffd966;color:#1a1a1a;
+  padding:8px 18px;
+  font-family:inherit;font-size:13px;font-weight:700;
+  border:none;border-radius:3px;cursor:pointer;
+  letter-spacing:.05em;
+  transition:background .15s;
+}
+.copy-btn:hover{background:#ffec99}
+.copy-btn.done{background:#a3d9a5}
+
+#promptOut{
+  background:transparent;
+  color:var(--code-ink);
+  font-family:'JetBrains Mono','Noto Sans SC',monospace;
+  font-size:12px;line-height:1.7;
+  white-space:pre-wrap;
+  word-break:break-all;
+  padding:0;
+  border:none;
+  width:100%;
+  min-height:calc(100vh - 350px);
+  resize:none;
+  outline:none;
+  letter-spacing:0;
+}
+#promptOut::selection{background:#ffd966;color:#1a1a1a}
+
+/* === Footer === */
+.footer{
+  padding:18px 56px;
+  background:var(--paper);
+  border-top:1px solid var(--bd);
+  font-size:11px;color:var(--mute);
+  text-align:center;
+}
+.footer .brand{
+  font-family:'Fraunces',serif;font-style:italic;
+  color:var(--accent);font-weight:700;
+}
+
+/* === Toast === */
+.toast{
+  position:fixed;bottom:30px;left:50%;transform:translateX(-50%);
+  background:#1a1a1a;color:#ffd966;
+  padding:12px 28px;
+  font-family:'Noto Serif SC',serif;font-weight:700;font-size:14px;
+  border-radius:3px;box-shadow:0 8px 32px rgba(0,0,0,.3);
+  opacity:0;pointer-events:none;
+  transition:opacity .3s, transform .3s;
+  z-index:1000;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(-8px)}
+
+/* === Mobile === */
+@media (max-width:1024px){
+  .main{grid-template-columns:1fr}
+  .right{position:sticky;top:0}
+  .hero{padding:28px}
+  .steps{padding:0 28px;flex-wrap:wrap}
+  .left{padding:20px}
+}
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="eyebrow">CUSTOMER PRODUCT INSIGHT · ONE-CLICK GENERATOR</div>
+  <h1>客户开品洞察 <span class="h">提示词生成器</span></h1>
+  <p class="lead">
+    粘贴你信任的<b>行业趋势报告网址</b> + 填写客户信息 → 一键生成专属提示词 →
+    喂给 ChatGPT/Claude/Gemini → 得到独家《开品洞察 OnePage》。
+    <br>视频号小店食饮赛道适用 · 任意品类（粮油 / 滋补 / 茶饮 / 美妆 / 家清...）通用 · 预计耗时 <b>5 分钟</b>。
+  </p>
+</div>
+
+<!-- STEPS -->
+<div class="steps">
+  <div class="step"><div class="n">1</div><div class="t"><b>选行业基线</b>粘贴趋势报告网址</div></div>
+  <div class="step"><div class="n">2</div><div class="t"><b>填客户信息</b>左侧表单 13 个字段</div></div>
+  <div class="step"><div class="n">3</div><div class="t"><b>一键复制提示词</b>右侧自动拼接</div></div>
+  <div class="step"><div class="n">4</div><div class="t"><b>喂给 LLM</b>ChatGPT / Claude / Gemini</div></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- LEFT: FORM -->
+  <div class="left">
+
+    <!-- 1. 行业基线报告 -->
+    <div class="section-hd">
+      <div class="num">01</div>
+      <div class="title">行业基线报告</div>
+      <div class="desc">让 AI 自己读，不预设</div>
+    </div>
+    <div class="field">
+      <label>参考报告网址<span class="req">*</span><span class="opt">多个用换行分隔</span></label>
+      <textarea id="f_baselines" rows="3" placeholder="粘贴一个或多个行业趋势报告的网址，AI 会自动访问并提取趋势数据作为基线">https://winglee777.github.io/q3-category-trend/longimage.html
+https://winglee777.github.io/q4-category-trend/longimage.html</textarea>
+      <div class="chips">
+        <span class="chip" data-baseline="q3">📊 仅 25Q3 报告</span>
+        <span class="chip" data-baseline="q4">📊 仅 25Q4 报告</span>
+        <span class="chip" data-baseline="both">📊 Q3 + Q4 双季</span>
+      </div>
+      <div class="hint"><b>说明</b>：可粘贴任意行业趋势报告网址（视频号小店食饮品类）。不限于本团队产出，也可以是其他赛道（茶饮/美妆/家清等）的趋势报告。</div>
+    </div>
+
+    <!-- 2. 基本信息 -->
+    <div class="section-hd">
+      <div class="num">02</div>
+      <div class="title">基本信息</div>
+      <div class="desc">2 个必填字段</div>
+    </div>
+    <div class="field">
+      <label>品牌名<span class="req">*</span></label>
+      <input id="f_brand" type="text" placeholder="例：沙漠一号" value="沙漠一号">
+    </div>
+    <div class="field">
+      <label>品牌阶段<span class="req">*</span></label>
+      <select id="f_stage">
+        <option value="起步期">起步期（0-1 年 / 单 SKU）</option>
+        <option value="成长期" selected>成长期（1-3 年 / 多 SKU）</option>
+        <option value="成熟期">成熟期（3 年+ / 矩阵化）</option>
+      </select>
+    </div>
+
+    <!-- 3. 原料与产品 -->
+    <div class="section-hd">
+      <div class="num">03</div>
+      <div class="title">原料与产品</div>
+      <div class="desc">越具体越精准</div>
+    </div>
+    <div class="field">
+      <label>核心原料<span class="req">*</span></label>
+      <input id="f_material" type="text" placeholder="例：虎坚果（油莎豆）" value="虎坚果（油莎豆）">
+    </div>
+    <div class="field">
+      <label>原料健康标签<span class="req">*</span><span class="opt">3-5 个，用 / 分隔</span></label>
+      <input id="f_tags" type="text" placeholder="例：低GI / 高膳食纤维 / 植物基" value="低GI / 高膳食纤维 / 植物基 / 高油酸 / 抗氧化">
+    </div>
+    <div class="field">
+      <label>原料文化背景<span class="opt">选填</span></label>
+      <input id="f_culture" type="text" placeholder="例：地中海原产 / 西班牙超级食物" value="地中海原产 / 西班牙超级食物 / 千年食材 / 沙漠绿洲">
+    </div>
+    <div class="field">
+      <label>现有 SKU<span class="req">*</span></label>
+      <input id="f_sku" type="text" placeholder="例：坚果酱（瓶装 200g）" value="坚果酱（瓶装 200g）">
+    </div>
+    <div class="field">
+      <label>现有客单价<span class="req">*</span></label>
+      <input id="f_price" type="text" placeholder="例：80-150 元" value="80-150 元">
+    </div>
+
+    <!-- 4. 生产能力 -->
+    <div class="section-hd">
+      <div class="num">04</div>
+      <div class="title">生产能力</div>
+      <div class="desc">决定能拓什么品</div>
+    </div>
+    <div class="field">
+      <label>可拓展形态<span class="req">*</span></label>
+      <input id="f_forms" type="text" placeholder="例：油脂 / 粉剂 / 酱类 / 饮品" value="油脂 / 粉剂 / 饮品 / 烘焙原料 / 能量棒 / 礼盒组合">
+      <div class="chips">
+        <span class="chip green" data-append="f_forms">油脂</span>
+        <span class="chip green" data-append="f_forms">粉剂</span>
+        <span class="chip green" data-append="f_forms">酱类</span>
+        <span class="chip green" data-append="f_forms">饮品</span>
+        <span class="chip green" data-append="f_forms">烘焙原料</span>
+        <span class="chip green" data-append="f_forms">能量棒</span>
+        <span class="chip green" data-append="f_forms">礼盒组合</span>
+        <span class="chip green" data-append="f_forms">调味料</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>产能限制<span class="opt">选填</span></label>
+      <input id="f_limit" type="text" placeholder="例：油脂产能优先 / 粉剂需外协" value="油脂产能优先">
+    </div>
+    <div class="field">
+      <label>食品安全资质<span class="opt">选填</span></label>
+      <input id="f_cert" type="text" placeholder="例：已有 SC / 婴幼儿辅食待办" value="已有 SC，婴幼儿辅食待办">
+    </div>
+
+    <!-- 5. 客群与目标 -->
+    <div class="section-hd">
+      <div class="num">05</div>
+      <div class="title">客群与目标</div>
+      <div class="desc">决定营销主线</div>
+    </div>
+    <div class="field">
+      <label>目标客群<span class="req">*</span><span class="opt">可多选</span></label>
+      <input id="f_audience" type="text" placeholder="例：25-40 岁女性 / 健身族 / 中老年送礼" value="25-40 岁女性 / 健身族 / 妈妈群 / 中老年送礼 / 控糖人群">
+      <div class="chips">
+        <span class="chip" data-append="f_audience">25-40 岁女性</span>
+        <span class="chip" data-append="f_audience">健身族</span>
+        <span class="chip" data-append="f_audience">妈妈群</span>
+        <span class="chip" data-append="f_audience">中老年送礼</span>
+        <span class="chip" data-append="f_audience">控糖人群</span>
+        <span class="chip" data-append="f_audience">单身青年</span>
+        <span class="chip" data-append="f_audience">儿童</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>特别诉求<span class="opt">决定第三张营销卡的主题色和重心</span></label>
+      <input id="f_special" type="text" placeholder="例：重点突出中老年送父母线" value="重点突出中老年送父母线">
+      <div class="chips">
+        <span class="chip gold" data-target="f_special">重点突出中老年送父母线</span>
+        <span class="chip gold" data-target="f_special">主攻 Q4 年货季</span>
+        <span class="chip gold" data-target="f_special">切入儿童辅食赛道</span>
+        <span class="chip gold" data-target="f_special">押注健身代餐</span>
+        <span class="chip gold" data-target="f_special">出海东南亚市场</span>
+      </div>
+      <div class="hint"><b>提示</b>：此字段决定第 3 张营销卡的主题。详细预设见右侧提示词附录。</div>
+    </div>
+    <div class="field">
+      <label>价格带定位<span class="req">*</span></label>
+      <select id="f_band">
+        <option value="性价比">性价比（30-80 元）</option>
+        <option value="中端">中端（80-200 元）</option>
+        <option value="中高端" selected>中高端（200-500 元）</option>
+        <option value="高端礼品级">高端礼品级（500+ 元）</option>
+      </select>
+    </div>
+
+    <!-- 6. 时间与预算 -->
+    <div class="section-hd">
+      <div class="num">06</div>
+      <div class="title">时间窗口</div>
+      <div class="desc">决定上市节奏</div>
+    </div>
+    <div class="field">
+      <label>规划时间<span class="req">*</span></label>
+      <input id="f_time" type="text" placeholder="例：26 全年 / 26 Q4 春节备战" value="26 全年">
+    </div>
+    <div class="field">
+      <label>预算量级<span class="opt">选填</span></label>
+      <input id="f_budget" type="text" placeholder="例：单品研发 50 万内" value="单品研发 50 万内">
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-second" id="btnReset">↺ 重置示例</button>
+      <button class="btn btn-primary" id="btnGenerate">⚡ 生成提示词</button>
+    </div>
+  </div>
+
+  <!-- RIGHT: PROMPT OUTPUT -->
+  <div class="right">
+    <div class="right-hd">
+      <div>
+        <div class="title">→ 实时生成的提示词 <span class="acc">Prompt</span></div>
+        <div class="meta">长度 <b id="promptLen">0</b> 字符 · 修改左侧后自动同步</div>
+      </div>
+      <button class="copy-btn" id="btnCopy">📋 复制全文</button>
+    </div>
+    <textarea id="promptOut" readonly></textarea>
+  </div>
+
+</div>
+
+<div class="footer">
+  <span class="brand">Customer Product Insight Generator V1.0</span> ·
+  数据基线：视频号小店 25Q3+Q4 实证（2025-07-01 — 2025-12-31）·
+  <span style="color:var(--accent);font-weight:700">2026.06</span>
+</div>
+
+<div class="toast" id="toast">✅ 已复制到剪贴板</div>
+
+<script>
+// === 默认示例值（沙漠一号 / 虎坚果） ===
+const BASELINE_PRESETS = {
+  q3: 'https://winglee777.github.io/q3-category-trend/longimage.html',
+  q4: 'https://winglee777.github.io/q4-category-trend/longimage.html',
+  both: 'https://winglee777.github.io/q3-category-trend/longimage.html\nhttps://winglee777.github.io/q4-category-trend/longimage.html',
+};
+
+const DEFAULTS = {
+  f_baselines: BASELINE_PRESETS.both,
+  f_brand: '沙漠一号',
+  f_stage: '成长期',
+  f_material: '虎坚果（油莎豆）',
+  f_tags: '低GI / 高膳食纤维 / 植物基 / 高油酸 / 抗氧化',
+  f_culture: '地中海原产 / 西班牙超级食物 / 千年食材 / 沙漠绿洲',
+  f_sku: '坚果酱（瓶装 200g）',
+  f_price: '80-150 元',
+  f_forms: '油脂 / 粉剂 / 饮品 / 烘焙原料 / 能量棒 / 礼盒组合',
+  f_limit: '油脂产能优先',
+  f_cert: '已有 SC，婴幼儿辅食待办',
+  f_audience: '25-40 岁女性 / 健身族 / 妈妈群 / 中老年送礼 / 控糖人群',
+  f_special: '重点突出中老年送父母线',
+  f_band: '中高端',
+  f_time: '26 全年',
+  f_budget: '单品研发 50 万内',
+};
+
+// === 提示词模板 ===
+function buildPrompt(d){
+  const customerInfo = `客户信息:
+  品牌名: "${d.f_brand}"
+  品牌阶段: "${d.f_stage}"
+  核心原料: "${d.f_material}"
+  原料健康标签: "${d.f_tags}"
+  原料文化背景: "${d.f_culture || '待定'}"
+  现有 SKU: "${d.f_sku}"
+  现有客单价: "${d.f_price}"
+  可拓展形态: "${d.f_forms}"
+  产能限制: "${d.f_limit || '待定'}"
+  食品安全资质: "${d.f_cert || '待定'}"
+  目标客群: "${d.f_audience}"
+  特别诉求: "${d.f_special || '无特别诉求'}"
+  价格带定位: "${d.f_band}"
+  规划时间: "${d.f_time}"
+  预算量级: "${d.f_budget || '待定'}"`;
+
+  // 拆分网址成列表
+  const urls = (d.f_baselines || '').split(/[\n,，;；\s]+/).map(s => s.trim()).filter(Boolean);
+  const urlList = urls.map((u, i) => `  ${i+1}. ${u}`).join('\n');
+  const urlCount = urls.length;
+
+  return `你是一位资深食品饮料赛道选品策略师，深度服务过保健、滋补、粮油调味、休闲、生鲜等多个细分赛道，
+熟悉视频号小店内容电商平台的爆品方法论。
+
+你将基于以下两份输入，为客户输出一份「开品洞察 onepage」：
+
+【输入 1 · 行业趋势基线】
+
+请先访问以下 ${urlCount} 个行业趋势报告网址，作为本次开品洞察的事实基线：
+${urlList}
+
+要求：
+- 必须先抓取并阅读全部网址内容，提取其中的品类大盘数据、时令节点、爆款单品、口味/场景/工艺关键词等关键信息
+- 后续所有趋势引用、单品对位锚点、数据支撑 必须来自这些报告，不得凭知识库编造
+- 如某网址打不开或内容不足，请明确告知用户"该网址未能获取"，不要绕开
+
+【输入 2 · 客户信息】
+${customerInfo}
+
+
+【你的任务】
+按以下五段式结构输出一份完整 HTML onepage（Editorial 报刊风、单文件自包含）。
+也可输出结构化 Markdown 后由用户自行套用模板。
+
+# 段 1：HERO 区
+- 大标题："${d.f_brand} · 拓品参考"+副标题（基于客户原料的核心心智 1 句话）
+- 一段 lead 文案：用 25Q3+Q4 数据点 + 客户原料标签，引出"原料基底不变 → 三维拓品"的核心方法论
+- 4 个关键 meta：基底原料 / 现有产品 / 核心标签 / 机会窗口
+
+# 段 2：拓品三维度（口味 × 场景 × 形态）
+对客户原料做三维拓展分析。每维度生成 1 张卡片，包含：
+- 主轴：基于客户原料天然属性的基底口味/基底场景/基底形态
+- 升级方向：基于基线报告里识别到的行业趋势，找到差异化升级路径
+- 节令/客群：结合特别诉求做定向调整
+- 8 个具体可选项标签（含 2-3 个用户最该重点押的"hot"标签）
+
+# 段 3：TOP 趋势 · 三张榜单
+分别对应口味 / 场景 / 形态。每榜 8 条目，必含：
+- 排名 + 关键词 + 数据支撑（直接引用基线报告里的具体数字/单品名）+ 标签
+- 数据必须来自基线报告，不能编造或泛化
+
+# 段 4：内容趋势 + 营销组合（三主线，重点突出客户特别诉求）
+生成 3 张并排的营销组合卡片：
+- 主线 1：基于基线报告里识别到的最大健康/成分类趋势，对应客户原料能承接的健康升级方向
+- 主线 2：基于基线报告里识别到的节令/送礼类趋势，对应客户原料能承接的复合心智
+- 主线 3：根据客户「特别诉求」字段定制（当前为「${d.f_special || '默认推送父母/送礼线'}」）
+每张卡含：核心心智 / 话术词 / 视觉锚 / 触达策略 / 组合品 / 时机
+卡片中必须明确该主线的【趋势数据支撑】（引用基线报告里的具体爆款/数据）+【客户原料如何承接】
+
+# 段 5：单品拓展矩阵 · 8 款建议品
+表格形式，列：优先级（P0/P1/P2/P3）/ 拓展单品 / 形态 / 核心场景 / 客群 / 差异化卖点 / 上市节奏
+- P0 单品 = 2 款（必含一款对应客户特别诉求的单品）
+- 每款单品的"差异化卖点"必须对位基线报告里的某个具体爆款（写明"对位 XXX 报告里的 XXX 单品 XXXw"）
+
+# 段 6：3 条避坑提示
+针对客户原料 + 客群定位 + 行业风险，给 3 条具体可执行的避坑建议。
+
+
+【输出风格规范】
+- 视觉：Editorial 报刊风（暖色调主导，避免白底紫色渐变）
+- 字体：Noto Serif SC（衬线大标题）+ Noto Sans SC（正文）+ Fraunces 斜体（英文装饰）
+- 字体 CDN：必须用 fonts.font.im（国内可访问，禁用 fonts.googleapis.com）
+- 配色：主色暖橙 #c2410c / 强调色金 #b8860b / 健康升级线绿 #2d6a4f
+- 文档信息：底部 footer 注明数据来源（引用的基线报告网址 + 取数周期）
+- 禁止：通用模板风、无信息量营销词（"科学配比""精心打造"）、置信度低的数据猜测
+
+
+【输出四条铁律】
+1. 任何引用的行业数据必须来自前文【行业趋势基线】里给出的网址内容，不得编造或用其他来源补充
+2. 客户的「特别诉求」字段决定第三张营销卡的主题色和重心，必须在 onepage 至少 3 处呼应
+3. P0 单品必须有"对位基线报告某个具体爆款"的明确锚点
+4. 如果某网址无法访问/内容不足，必须在输出开头明确声明，不要绕开
+
+现在请先访问基线网址，再输出完整 HTML（或 Markdown 结构化方案）。`;
+}
+
+// === 收集表单数据 ===
+function collectData(){
+  const d = {};
+  for(const k in DEFAULTS){
+    const el = document.getElementById(k);
+    d[k] = el ? el.value.trim() : '';
+  }
+  return d;
+}
+
+// === 渲染提示词 ===
+function render(){
+  const d = collectData();
+  const text = buildPrompt(d);
+  document.getElementById('promptOut').value = text;
+  document.getElementById('promptLen').textContent = text.length.toLocaleString();
+}
+
+// === 重置 ===
+function reset(){
+  for(const k in DEFAULTS){
+    const el = document.getElementById(k);
+    if(el) el.value = DEFAULTS[k];
+  }
+  render();
+  showToast('↺ 已重置为虎坚果示例');
+}
+
+// === Chip 点击 ===
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const targetId = chip.dataset.target;
+    const appendId = chip.dataset.append;
+    const baseline = chip.dataset.baseline;
+    if(baseline && BASELINE_PRESETS[baseline]){
+      document.getElementById('f_baselines').value = BASELINE_PRESETS[baseline];
+    } else if(targetId){
+      document.getElementById(targetId).value = chip.textContent;
+    } else if(appendId){
+      const el = document.getElementById(appendId);
+      const cur = el.value.trim();
+      if(cur && !cur.includes(chip.textContent)){
+        el.value = cur + ' / ' + chip.textContent;
+      } else if(!cur){
+        el.value = chip.textContent;
+      }
+    }
+    render();
+  });
+});
+
+// === 表单变化监听 ===
+document.querySelectorAll('input,textarea,select').forEach(el => {
+  el.addEventListener('input', render);
+  el.addEventListener('change', render);
+});
+
+// === 复制 ===
+document.getElementById('btnCopy').addEventListener('click', () => {
+  const text = document.getElementById('promptOut').value;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('btnCopy');
+    btn.classList.add('done');
+    btn.textContent = '✓ 已复制';
+    showToast('✅ 已复制到剪贴板，请粘贴到 ChatGPT / Claude');
+    setTimeout(() => {
+      btn.classList.remove('done');
+      btn.textContent = '📋 复制全文';
+    }, 2000);
+  }).catch(() => {
+    // fallback
+    const ta = document.getElementById('promptOut');
+    ta.select();
+    document.execCommand('copy');
+    showToast('✅ 已复制到剪贴板');
+  });
+});
+
+document.getElementById('btnReset').addEventListener('click', reset);
+document.getElementById('btnGenerate').addEventListener('click', () => {
+  render();
+  showToast('⚡ 提示词已生成，请点击「📋 复制全文」');
+});
+
+// === Toast ===
+let toastTimer;
+function showToast(msg){
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+// === 初始渲染 ===
+render();
+</script>
+</body>
+</html>
