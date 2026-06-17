@@ -456,6 +456,29 @@ https://winglee777.github.io/q4-category-trend/longimage.html</textarea>
       <input id="f_budget" type="text" placeholder="例：单品研发 50 万内" value="单品研发 50 万内">
     </div>
 
+    <!-- 7. 产出定制（NEW · 销售自定义产能）-->
+    <div class="section-hd">
+      <div class="num">07</div>
+      <div class="title">产出定制 <span style="background:#fef3e7;color:#c2410c;font-size:10px;font-weight:900;padding:2px 6px;border-radius:2px;margin-left:6px;letter-spacing:.05em">NEW</span></div>
+      <div class="desc">销售按客户复杂度自定义产出数量·智能 Copilot 不再写死</div>
+    </div>
+    <div class="field">
+      <label>SKU 拓品矩阵数量<span class="req">*</span></label>
+      <input id="f_sku_count" type="number" min="5" max="15" value="8" placeholder="默认 8（建议范围 5-15）">
+    </div>
+    <div class="field">
+      <label>P0 优先级单品数量<span class="req">*</span></label>
+      <input id="f_p0_count" type="number" min="1" max="5" value="2" placeholder="默认 2（建议范围 1-5）">
+    </div>
+    <div class="field">
+      <label>营销主线数量<span class="req">*</span></label>
+      <input id="f_marketing_count" type="number" min="2" max="5" value="3" placeholder="默认 3（建议范围 2-5）">
+    </div>
+    <div class="field">
+      <label>三维度标签 / 榜单条目数量<span class="opt">选填</span></label>
+      <input id="f_tag_count" type="number" min="5" max="12" value="8" placeholder="默认 8（建议范围 5-12）">
+    </div>
+
     <div class="btn-row">
       <button class="btn btn-second" id="btnReset">↺ 重置示例</button>
       <button class="btn btn-primary" id="btnGenerate">⚡ 生成提示词</button>
@@ -477,7 +500,7 @@ https://winglee777.github.io/q4-category-trend/longimage.html</textarea>
 </div>
 
 <div class="footer">
-  <span class="brand">Customer Product Insight Generator V1.0</span> ·
+  <span class="brand">Customer Product Insight Generator V1.1 · 产出可定制版</span> ·
   数据基线：视频号小店 25Q3+Q4 实证（2025-07-01 — 2025-12-31）·
   <span style="color:var(--accent);font-weight:700">2026.06</span>
 </div>
@@ -509,6 +532,10 @@ const DEFAULTS = {
   f_band: '中高端',
   f_time: '26 全年',
   f_budget: '单品研发 50 万内',
+  f_sku_count: '8',
+  f_p0_count: '2',
+  f_marketing_count: '3',
+  f_tag_count: '8',
 };
 
 // === 提示词模板 ===
@@ -534,6 +561,19 @@ function buildPrompt(d){
   const urls = (d.f_baselines || '').split(/[\n,，;；\s]+/).map(s => s.trim()).filter(Boolean);
   const urlList = urls.map((u, i) => `  ${i+1}. ${u}`).join('\n');
   const urlCount = urls.length;
+
+  // 产出数量定制（销售自定）
+  const skuCount = Math.max(5, Math.min(15, parseInt(d.f_sku_count) || 8));
+  const p0Count = Math.max(1, Math.min(5, parseInt(d.f_p0_count) || 2));
+  const marketingCount = Math.max(2, Math.min(5, parseInt(d.f_marketing_count) || 3));
+  const tagCount = Math.max(5, Math.min(12, parseInt(d.f_tag_count) || 8));
+
+  // 营销主线动态描述
+  const marketingDesc = marketingCount === 2
+    ? `生成 2 张并排的营销组合卡片（健康/成分线 + 客户特别诉求线）`
+    : marketingCount === 3
+      ? `生成 3 张并排的营销组合卡片（健康/成分线 + 节令/送礼线 + 客户特别诉求线）`
+      : `生成 ${marketingCount} 张并排的营销组合卡片（前 ${marketingCount-1} 张围绕基线报告里的多元趋势主线，最后一张围绕客户特别诉求定制）`;
 
   return `你是一位资深食品饮料赛道选品策略师，深度服务过保健、滋补、粮油调味、休闲、生鲜等多个细分赛道，
 熟悉视频号小店内容电商平台的爆品方法论。
@@ -568,24 +608,23 @@ ${customerInfo}
 - 主轴：基于客户原料天然属性的基底口味/基底场景/基底形态
 - 升级方向：基于基线报告里识别到的行业趋势，找到差异化升级路径
 - 节令/客群：结合特别诉求做定向调整
-- 8 个具体可选项标签（含 2-3 个用户最该重点押的"hot"标签）
+- ${tagCount} 个具体可选项标签（含 2-3 个用户最该重点押的"hot"标签）
 
 # 段 3：TOP 趋势 · 三张榜单
-分别对应口味 / 场景 / 形态。每榜 8 条目，必含：
+分别对应口味 / 场景 / 形态。每榜 ${tagCount} 条目，必含：
 - 排名 + 关键词 + 数据支撑（直接引用基线报告里的具体数字/单品名）+ 标签
 - 数据必须来自基线报告，不能编造或泛化
 
-# 段 4：内容趋势 + 营销组合（三主线，重点突出客户特别诉求）
-生成 3 张并排的营销组合卡片：
-- 主线 1：基于基线报告里识别到的最大健康/成分类趋势，对应客户原料能承接的健康升级方向
-- 主线 2：基于基线报告里识别到的节令/送礼类趋势，对应客户原料能承接的复合心智
-- 主线 3：根据客户「特别诉求」字段定制（当前为「${d.f_special || '默认推送父母/送礼线'}」）
+# 段 4：内容趋势 + 营销组合（${marketingCount} 主线，重点突出客户特别诉求）
+${marketingDesc}：
+- 前 ${marketingCount - 1} 主线：基于基线报告里识别到的多元趋势，对应客户原料能承接的方向（如健康/成分、节令/送礼、复合心智等）
+- 最后 1 主线：根据客户「特别诉求」字段定制（当前为「${d.f_special || '默认推送父母/送礼线'}」）
 每张卡含：核心心智 / 话术词 / 视觉锚 / 触达策略 / 组合品 / 时机
 卡片中必须明确该主线的【趋势数据支撑】（引用基线报告里的具体爆款/数据）+【客户原料如何承接】
 
-# 段 5：单品拓展矩阵 · 8 款建议品
+# 段 5：单品拓展矩阵 · ${skuCount} 款建议品
 表格形式，列：优先级（P0/P1/P2/P3）/ 拓展单品 / 形态 / 核心场景 / 客群 / 差异化卖点 / 上市节奏
-- P0 单品 = 2 款（必含一款对应客户特别诉求的单品）
+- P0 单品 = ${p0Count} 款（必含一款对应客户特别诉求的单品）
 - 每款单品的"差异化卖点"必须对位基线报告里的某个具体爆款（写明"对位 XXX 报告里的 XXX 单品 XXXw"）
 
 # 段 6：3 条避坑提示
