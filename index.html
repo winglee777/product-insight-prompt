@@ -314,15 +314,35 @@ html,body{
       <div class="desc">让 AI 自己读，不预设</div>
     </div>
     <div class="field">
-      <label>参考报告网址<span class="req">*</span><span class="opt">多个用换行分隔</span></label>
-      <textarea id="f_baselines" rows="3" placeholder="粘贴一个或多个行业趋势报告的网址，AI 会自动访问并提取趋势数据作为基线">https://winglee777.github.io/q3-category-trend/longimage.html
-https://winglee777.github.io/q4-category-trend/longimage.html</textarea>
+      <label>参考报告网址<span class="req">*</span><span class="opt">多个用换行分隔 · 默认已带 AI 友好兜底地址</span></label>
+      <textarea id="f_baselines" rows="5" placeholder="粘贴一个或多个行业趋势报告的网址，AI 会自动访问并提取趋势数据作为基线">https://winglee777.github.io/q3-category-trend/longimage.html
+https://winglee777.github.io/q3-category-trend/api/data.md
+https://winglee777.github.io/q4-category-trend/longimage.html
+https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
+      <div style="font-size:11.5px;color:var(--mute);line-height:1.65;margin:6px 0 8px;padding:8px 12px;background:#fdf6e3;border-left:3px solid var(--gold);">
+        💡 <b>为什么有 4 个网址？</b><br>
+        · <code>longimage.html</code> 是给人类看的交互式报告（数据 JS 动态加载）<br>
+        · <code>api/data.md</code> 是给 <b>AI agent 兜底</b>的静态文本版（爆款 SKU / 关键词全在里面）<br>
+        · 双投递确保 <b>任何 AI agent（Claude/GPT/Codex/Gemini）拿到提示词都能正常工作</b>
+      </div>
       <div class="chips">
         <span class="chip" data-baseline="q3">📊 仅 25Q3 报告</span>
         <span class="chip" data-baseline="q4">📊 仅 25Q4 报告</span>
-        <span class="chip" data-baseline="both">📊 Q3 + Q4 双季</span>
+        <span class="chip" data-baseline="both">📊 Q3 + Q4 双季（推荐）</span>
+        <span class="chip" data-baseline="ai_only">🤖 仅 AI 兜底版（最稳）</span>
       </div>
       <div class="hint"><b>说明</b>：可粘贴任意行业趋势报告网址（视频号小店食饮品类）。不限于本团队产出，也可以是其他赛道（茶饮/美妆/家清等）的趋势报告。</div>
+    </div>
+
+    <div class="field">
+      <label>
+        手动粘贴报告数据
+        <span class="opt">选填 · 兜底中的兜底</span>
+      </label>
+      <textarea id="f_manual_data" rows="4" placeholder="（选填）当 AI 工具联网受限 / 网址被墙 / 报告页失效时，可直接把报告里的 TOP 爆款表格、关键词列表、insight 段落复制粘贴到这里。AI 会把这段数据作为最高优先级的基线。"></textarea>
+      <div style="font-size:11.5px;color:var(--mute);line-height:1.65;margin:6px 0 0;">
+        💡 <b>什么时候用</b>：你跑 AI 时如果发现产出里"对位锚点都很泛"或者"P0 单品 GMV 数字写错"——说明 AI 没拿到颗粒数据，把报告里的爆款表格直接粘贴过来，AI 立刻就能写实。
+      </div>
     </div>
 
     <!-- 2. 基本信息 -->
@@ -500,9 +520,10 @@ https://winglee777.github.io/q4-category-trend/longimage.html</textarea>
 </div>
 
 <div class="footer">
-  <span class="brand">Customer Product Insight Generator V1.1 · 产出可定制版</span> ·
+  <span class="brand">Customer Product Insight Generator V1.2 · AI Agent 通用版</span> ·
   数据基线：视频号小店 25Q3+Q4 实证（2025-07-01 — 2025-12-31）·
   <span style="color:var(--accent);font-weight:700">2026.06</span>
+  <br><span style="font-size:11px;color:var(--mute)">⚡ V1.2 升级：内嵌 AI 兜底数据 fallback 链 + 手动粘贴兜底输入框，确保 Claude/GPT/Codex/Gemini 任何 agent 都能稳定产出</span>
 </div>
 
 <div class="toast" id="toast">✅ 已复制到剪贴板</div>
@@ -510,13 +531,15 @@ https://winglee777.github.io/q4-category-trend/longimage.html</textarea>
 <script>
 // === 默认示例值（沙漠一号 / 虎坚果） ===
 const BASELINE_PRESETS = {
-  q3: 'https://winglee777.github.io/q3-category-trend/longimage.html',
-  q4: 'https://winglee777.github.io/q4-category-trend/longimage.html',
-  both: 'https://winglee777.github.io/q3-category-trend/longimage.html\nhttps://winglee777.github.io/q4-category-trend/longimage.html',
+  q3: 'https://winglee777.github.io/q3-category-trend/longimage.html\nhttps://winglee777.github.io/q3-category-trend/api/data.md',
+  q4: 'https://winglee777.github.io/q4-category-trend/longimage.html\nhttps://winglee777.github.io/q4-category-trend/api/data.md',
+  both: 'https://winglee777.github.io/q3-category-trend/longimage.html\nhttps://winglee777.github.io/q3-category-trend/api/data.md\nhttps://winglee777.github.io/q4-category-trend/longimage.html\nhttps://winglee777.github.io/q4-category-trend/api/data.md',
+  ai_only: 'https://winglee777.github.io/q3-category-trend/api/data.md\nhttps://winglee777.github.io/q4-category-trend/api/data.md',
 };
 
 const DEFAULTS = {
   f_baselines: BASELINE_PRESETS.both,
+  f_manual_data: '',
   f_brand: '沙漠一号',
   f_stage: '成长期',
   f_material: '虎坚果（油莎豆）',
@@ -562,6 +585,12 @@ function buildPrompt(d){
   const urlList = urls.map((u, i) => `  ${i+1}. ${u}`).join('\n');
   const urlCount = urls.length;
 
+  // 手动粘贴数据（兜底中的兜底）：当 AI 无法联网或网址失效时直接用文本
+  const manualData = (d.f_manual_data || '').trim();
+  const manualPart = manualData
+    ? `\n\n【输入 1.5 · 手动粘贴的基线数据（最高优先级）】\n用户已直接粘贴以下报告数据。如果你（AI）无法访问上述网址，请<b>优先使用</b>下面这段数据作为基线：\n\n<<<MANUAL_DATA_BEGIN\n${manualData}\nMANUAL_DATA_END>>>\n\n（这段数据由销售/运营从报告网页里直接复制，权威性高于任何 AI 联网抓取的结果）`
+    : '';
+
   // 产出数量定制（销售自定）
   const skuCount = Math.max(5, Math.min(15, parseInt(d.f_sku_count) || 8));
   const p0Count = Math.max(1, Math.min(5, parseInt(d.f_p0_count) || 2));
@@ -582,13 +611,26 @@ function buildPrompt(d){
 
 【输入 1 · 行业趋势基线】
 
-请先访问以下 ${urlCount} 个行业趋势报告网址，作为本次开品洞察的事实基线：
+请按以下 ${urlCount} 个网址抓取行业趋势基线（已为你准备了 longimage.html 交互页 + api/data.md AI 兜底两套，确保你能拿到颗粒数据）：
 ${urlList}
 
+🔑 数据获取策略（避免抓不到颗粒数据）：
+1. **优先策略**：尝试 web_fetch 所有给定网址，提取品类大盘、爆款 SKU、口味/场景/卖点关键词。
+2. **若 longimage.html 仅返回大盘数据而无爆款 SKU 颗粒**（因 JS 动态渲染导致）：
+   → 立即 fallback 抓取同目录下的 \`./api/data.md\` 或 \`./api/data.json\`，那里有完整的：
+      · 全品类 GMV 排行 + 各品类 SKU/销量
+      · 时令节点 × 营销主题 × 核心品 × 卖点 × 人群
+      · 全品类 TOP10 + 分品类 TOP10 爆款 SKU（含 GMV、销量、口味、场景、卖点）
+      · 原料 / 卖点 / 口味 / 场景 关键词统计
+      · 核心 insight 笔记
+3. **如果连 api/data.md 也访问不到**：在输出最开头明确声明"基线数据未能获取"，并请用户：
+   ① 把报告网页里的 TOP 爆款数据直接复制粘贴给你；
+   ② 或检查网址是否可访问。**绝不允许用通用知识库猜测数据填充。**
+
 要求：
-- 必须先抓取并阅读全部网址内容，提取其中的品类大盘数据、时令节点、爆款单品、口味/场景/工艺关键词等关键信息
-- 后续所有趋势引用、单品对位锚点、数据支撑 必须来自这些报告，不得凭知识库编造
-- 如某网址打不开或内容不足，请明确告知用户"该网址未能获取"，不要绕开
+- 必须先抓取并阅读上述网址内容，提取其中的品类大盘数据、时令节点、爆款单品、口味/场景/工艺关键词等关键信息
+- 后续所有趋势引用、单品对位锚点、数据支撑必须来自这些报告，不得凭知识库编造
+- 在每个引用具体爆款 / GMV 数字的地方，标注数据出处（如"对位 Q4 报告 · 国联水产广式水晶虾饺 191w"）${manualPart}
 
 【输入 2 · 客户信息】
 ${customerInfo}
@@ -641,12 +683,12 @@ ${marketingDesc}：
 
 
 【输出四条铁律】
-1. 任何引用的行业数据必须来自前文【行业趋势基线】里给出的网址内容，不得编造或用其他来源补充
+1. 任何引用的行业数据必须来自前文【行业趋势基线】里的网址内容或【输入 1.5 · 手动粘贴的基线数据】，**不得编造**或用其他来源补充
 2. 客户的「特别诉求」字段决定第三张营销卡的主题色和重心，必须在 onepage 至少 3 处呼应
-3. P0 单品必须有"对位基线报告某个具体爆款"的明确锚点
-4. 如果某网址无法访问/内容不足，必须在输出开头明确声明，不要绕开
+3. P0 单品必须有"对位基线报告某个具体爆款"的明确锚点（标明爆款名 + GMV 数字 + 报告出处）
+4. 数据获取失败的处置：先尝试 longimage.html → 失败 fallback 到 api/data.md → 再失败用【手动粘贴的基线数据】→ 都没有则在输出开头明确声明"基线数据未能获取"，**绝不允许猜测填充**
 
-现在请先访问基线网址，再输出完整 HTML（或 Markdown 结构化方案）。`;
+现在请先按上述策略获取基线数据，再输出完整 HTML（或 Markdown 结构化方案）。`;
 }
 
 // === 收集表单数据 ===
