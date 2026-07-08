@@ -345,6 +345,20 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
       </div>
     </div>
 
+    <div class="field">
+      <label>
+        📎 本地文件上传
+        <span class="opt">选填 · 客户档案 / 竞品调研 / 内部访谈纪要</span>
+      </label>
+      <input type="file" id="f_files" multiple accept=".md,.txt,.csv" style="padding:6px 8px;background:#fafaf6;border:1px dashed var(--bd);border-radius:3px;font-size:12px;cursor:pointer;">
+      <div id="f_files_list" style="font-size:11px;color:var(--sub);margin-top:6px;line-height:1.6"></div>
+      <div style="font-size:11.5px;color:var(--mute);line-height:1.65;margin:6px 0 0;padding:8px 12px;background:#e8f3ee;border-left:3px solid var(--green);">
+        📁 <b>支持格式</b>：<code>.md</code> / <code>.txt</code> / <code>.csv</code>（多文件，单文件建议 &lt;100KB）<br>
+        · 客户 CRM 档案、内部客户访谈纪要、品牌手册、竞品调研笔记都可以传<br>
+        · &lt;50KB 会全文注入 Prompt，&gt;50KB 会自动裁剪为摘要（前3000字+后2000字）
+      </div>
+    </div>
+
     <!-- 2. 基本信息 -->
     <div class="section-hd">
       <div class="num">02</div>
@@ -379,12 +393,14 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
       <input id="f_tags" type="text" placeholder="例：低GI / 高膳食纤维 / 植物基" value="低GI / 高膳食纤维 / 植物基 / 高油酸 / 抗氧化">
     </div>
     <div class="field">
-      <label>原料文化背景<span class="opt">选填</span></label>
-      <input id="f_culture" type="text" placeholder="例：地中海原产 / 西班牙超级食物" value="地中海原产 / 西班牙超级食物 / 千年食材 / 沙漠绿洲">
+      <label>客户独特之处<span class="opt" style="color:var(--accent);font-weight:600">⭐推荐填写</span></label>
+      <input id="f_culture" type="text" placeholder="例：地中海原产 / 西班牙超级食物 / 千年食材 / 沙漠绿洲" value="地中海原产 / 西班牙超级食物 / 千年食材 / 沙漠绿洲">
+      <div class="hint">这个客户和同品类竞品比，最不一样的地方是什么？<b>产地/工艺/创始人故事/文化基因</b>都可以——填了 AI 就有差异化锚点，不填也能跑（AI 会从品牌名和原料推断）。</div>
     </div>
     <div class="field">
-      <label>现有 SKU<span class="req">*</span></label>
-      <input id="f_sku" type="text" placeholder="例：坚果酱（瓶装 200g）" value="坚果酱（瓶装 200g）">
+      <label>现有 SKU<span class="req">*</span><span class="opt">多品用 / 分隔，AI 会主动避免重复推荐</span></label>
+      <input id="f_sku" type="text" placeholder="例：坚果酱（瓶装 200g） / 冷压坚果油 / 坚果粉冲饮" value="坚果酱（瓶装 200g）">
+      <div class="hint">⚠️ 至少填 1 个，AI 会把这些当作「已饱和方向」——推荐的口味/形态/场景若与现有 SKU 重合度过高，会自动升级维度或替换方向。</div>
     </div>
     <div class="field">
       <label>现有客单价<span class="req">*</span></label>
@@ -440,16 +456,19 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
       </div>
     </div>
     <div class="field">
-      <label>特别诉求<span class="opt">决定第三张营销卡的主题色和重心</span></label>
-      <input id="f_special" type="text" placeholder="例：重点突出中老年送父母线" value="重点突出中老年送父母线">
+      <label>特别诉求<span class="opt" style="color:var(--accent);font-weight:600">⭐推荐填写</span></label>
+      <input id="f_special" type="text" placeholder="点击下方 chip 一键填入，也可以自己写" value="重点突出中老年送父母线">
       <div class="chips">
+        <span class="chip gold" data-target="f_special">🎯 突出产地风土</span>
+        <span class="chip gold" data-target="f_special">💡 主攻应季场景</span>
+        <span class="chip gold" data-target="f_special">👑 切入高端礼盒</span>
         <span class="chip gold" data-target="f_special">重点突出中老年送父母线</span>
         <span class="chip gold" data-target="f_special">主攻 Q4 年货季</span>
         <span class="chip gold" data-target="f_special">切入儿童辅食赛道</span>
         <span class="chip gold" data-target="f_special">押注健身代餐</span>
         <span class="chip gold" data-target="f_special">出海东南亚市场</span>
       </div>
-      <div class="hint"><b>提示</b>：此字段决定第 3 张营销卡的主题。详细预设见右侧提示词附录。</div>
+      <div class="hint">此字段决定第 3 张营销卡的主题——客户想切入的新场景（超越基线报告、允许发散）。填了 AI 会重点押这条线，不填也能跑（AI 会走通用路径）。</div>
     </div>
     <div class="field">
       <label>价格带定位<span class="req">*</span></label>
@@ -520,10 +539,10 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
 </div>
 
 <div class="footer">
-  <span class="brand">Customer Product Insight Generator V1.2 · AI Agent 通用版</span> ·
+  <span class="brand">Customer Product Insight Generator V1.3 · 差异化拓品版</span> ·
   数据基线：视频号小店 25Q3+Q4 实证（2025-07-01 — 2025-12-31）·
-  <span style="color:var(--accent);font-weight:700">2026.06</span>
-  <br><span style="font-size:11px;color:var(--mute)">⚡ V1.2 升级：内嵌 AI 兜底数据 fallback 链 + 手动粘贴兜底输入框，确保 Claude/GPT/Codex/Gemini 任何 agent 都能稳定产出</span>
+  <span style="color:var(--accent);font-weight:700">2026.07</span>
+  <br><span style="font-size:11px;color:var(--mute)">⚡ V1.3 升级：客户独特之处锚定 + 现有 SKU 禁区去重 + web_search 三铁律 + 本地文件上传 + 软校验弹窗，解决"不同客户跑出雷同方案"问题</span>
 </div>
 
 <div class="toast" id="toast">✅ 已复制到剪贴板</div>
@@ -561,6 +580,9 @@ const DEFAULTS = {
   f_tag_count: '8',
 };
 
+// === 已上传的本地文件内容缓存 ===
+const UPLOADED_FILES = []; // {name, size, content, truncated}
+
 // === 提示词模板 ===
 function buildPrompt(d){
   const customerInfo = `客户信息:
@@ -568,17 +590,26 @@ function buildPrompt(d){
   品牌阶段: "${d.f_stage}"
   核心原料: "${d.f_material}"
   原料健康标签: "${d.f_tags}"
-  原料文化背景: "${d.f_culture || '待定'}"
+  客户独特之处: "${d.f_culture || '（用户未填写，请你从品牌名/核心原料/健康标签主动推断1-2个差异化亮点）'}"
   现有 SKU: "${d.f_sku}"
   现有客单价: "${d.f_price}"
   可拓展形态: "${d.f_forms}"
   产能限制: "${d.f_limit || '待定'}"
   食品安全资质: "${d.f_cert || '待定'}"
   目标客群: "${d.f_audience}"
-  特别诉求: "${d.f_special || '无特别诉求'}"
+  特别诉求: "${d.f_special || '（用户未填写，请走通用路径：从客户原料+客群推导最合适的营销主线）'}"
   价格带定位: "${d.f_band}"
   规划时间: "${d.f_time}"
   预算量级: "${d.f_budget || '待定'}"`;
+
+  // 拼接已上传的本地文件内容
+  const uploadedPart = UPLOADED_FILES.length > 0
+    ? '\n\n【输入 1.8 · 用户上传的本地文件（客户档案/竞品调研/内部访谈）】\n' +
+      '以下是用户上传的本地文件内容，包含该客户的独家信息（非公开数据）。请优先参考这些内容做客户特化：\n\n' +
+      UPLOADED_FILES.map(f =>
+        `<<<FILE: ${f.name} (${(f.size/1024).toFixed(1)}KB${f.truncated?' · 已裁剪为摘要':''})\n${f.content}\nEND_FILE>>>`
+      ).join('\n\n')
+    : '';
 
   // 拆分网址成列表
   const urls = (d.f_baselines || '').split(/[\n,，;；\s]+/).map(s => s.trim()).filter(Boolean);
@@ -630,7 +661,7 @@ ${urlList}
 要求：
 - 必须先抓取并阅读上述网址内容，提取其中的品类大盘数据、时令节点、爆款单品、口味/场景/工艺关键词等关键信息
 - 后续所有趋势引用、单品对位锚点、数据支撑必须来自这些报告，不得凭知识库编造
-- 在每个引用具体爆款 / GMV 数字的地方，标注数据出处（如"对位 Q4 报告 · 国联水产广式水晶虾饺 191w"）${manualPart}
+- 在每个引用具体爆款 / GMV 数字的地方，标注数据出处（如"对位 Q4 报告 · 国联水产广式水晶虾饺 191w"）${manualPart}${uploadedPart}
 
 【输入 2 · 客户信息】
 ${customerInfo}
@@ -682,11 +713,55 @@ ${marketingDesc}：
 - 禁止：通用模板风、无信息量营销词（"科学配比""精心打造"）、置信度低的数据猜测
 
 
-【输出四条铁律】
-1. 任何引用的行业数据必须来自前文【行业趋势基线】里的网址内容或【输入 1.5 · 手动粘贴的基线数据】，**不得编造**或用其他来源补充
+【客户独特之处 = 差异化壁垒（重要！）】
+读取"客户独特之处"字段（当前为「${d.f_culture || '（空）'}」）——每条营销主线、每款拓品、每个卖点，都必须让这个基因成为差异化壁垒：
+- 若填写了具体内容（如"云南产地/家族茶园/非遗工艺"）：所有营销叙事必须围绕它展开，让"换掉这个客户，方案就跑不通"成为质检标准
+- 若字段为空：请主动从「品牌名+核心原料+健康标签」推断1-2个差异化亮点，并在方案开头明确标注"（基于XX推断，如不准确请回填「客户独特之处」字段）"
+- 检查标准：如果这份方案换个同品类客户也能用 = 独特性不够，必须重写
+
+【现有 SKU = 禁区（重要！）】
+读取"现有 SKU"字段（当前为「${d.f_sku}」）——AI 推荐时必须逐条比对：
+- 推荐的口味/形态/场景若与现有 SKU 重合度 >60% → 必须升级维度（如"客户已有黑咖" → 推"云南花香黑咖"而非"黑咖"）
+- 最终方案里必须显式列一段"已避开的方向：客户现有 XX，故不推 YY；改推 ZZ 作为升级方向"
+- 检查标准：如果推荐单品和现有 SKU 只是"改个规格/换个包装"级别 = 不算拓品，必须替换
+
+【外部信息补充 · 有边界的发散（重要！）】
+允许你使用 web_search，但**仅服务于以下 3 类**，其余场景禁止发散：
+1. **同品类竞品验证**：某个方向是否已有品牌验证过（如"皮爷已出云南重瓣玫瑰拿铁"），目的是给出信心背书
+2. **目标人群心智数据**：近 1 年内的人群报告/文章（如"女性贡献 68% 咖啡销量"），目的是解释"为什么这个人群会买"
+3. **原料/产地文化**：原料的风味科学依据或产地文化背景，目的是让叙事有厚度
+
+❌ 禁止 web_search 的场景：
+- 不要用 web_search 替代小店榜单数据（榜单必须以基线报告为准）
+- 不要引用抖音/小红书/B站爆款视频作为"趋势"（那是内容平台数据，不是电商成交）
+- 不要引用行业规模/GMV/融资等大盘数据（对小店选品无操作指导意义）
+
+【数据权重优先级 · 强制遵守】
+  P0 · 小店基线报告（榜单/热度/增速）→ 决定"卖什么"的骨架
+  P1 · 客户独特之处 + 现有 SKU + 特别诉求 + 上传文件 → 决定"怎么和别人不一样"
+  P2 · web_search 竞品/心智/产地 → 决定"叙事怎么讲"（血肉）
+
+骨架必须来自 P0，血肉才允许来自 P2。web_search 结论若与小店榜单矛盾，**以小店榜单为准**。
+
+
+【输出前自检清单（生成初稿后必须逐条自查，任何一项不通过则重写）】
+□ 是否与客户现有 SKU 有 >60% 重合？
+□ 是否每条营销主线都体现了客户独特之处（换个客户方案就跑不通）？
+□ 是否每个维度都有至少 1 条外部信息（非小店数据）支撑？
+□ 是否 P0 单品都标注了对位基线报告的具体爆款+GMV？
+□ ${marketingCount} 条营销主线之间是否有明显区隔（客群/场景/口味不重复）？
+□ 是否每条 web_search 引用都标注了 (web_search · 来源) ？
+
+
+【输出八条铁律】
+1. 任何引用的行业数据（榜单/热度/增速/爆款）必须来自前文【行业趋势基线】里的网址内容或【手动粘贴的基线数据】或【上传的本地文件】，**不得编造**或用其他来源补充
 2. 客户的「特别诉求」字段决定第三张营销卡的主题色和重心，必须在 onepage 至少 3 处呼应
 3. P0 单品必须有"对位基线报告某个具体爆款"的明确锚点（标明爆款名 + GMV 数字 + 报告出处）
 4. 数据获取失败的处置：先尝试 longimage.html → 失败 fallback 到 api/data.md → 再失败用【手动粘贴的基线数据】→ 都没有则在输出开头明确声明"基线数据未能获取"，**绝不允许猜测填充**
+5. 【独特性锚定】方案必须体现"客户独特之处"，让"换个客户方案就跑不通"作为质检标准
+6. 【禁区去重】必须显式避开客户现有 SKU 覆盖的方向，方案里明确列出"已避开的方向"
+7. 【web_search 边界】只允许用于竞品验证/人群心智/产地文化 3 类，且每条引用必须标注 (web_search · 具体来源)
+8. 【数据权重】P0 小店榜单 > P1 客户信息 > P2 web_search，权重高的数据源与权重低的冲突时以高权重为准
 
 现在请先按上述策略获取基线数据，再输出完整 HTML（或 Markdown 结构化方案）。`;
 }
@@ -770,10 +845,102 @@ document.getElementById('btnCopy').addEventListener('click', () => {
 });
 
 document.getElementById('btnReset').addEventListener('click', reset);
+
+// === 生成提示词（带软校验） ===
 document.getElementById('btnGenerate').addEventListener('click', () => {
+  const d = collectData();
+
+  // 硬校验：必填字段
+  const requiredFields = {
+    f_baselines: '参考报告网址',
+    f_brand: '品牌名',
+    f_material: '核心原料',
+    f_tags: '原料健康标签',
+    f_sku: '现有 SKU（至少 1 个）',
+    f_price: '现有客单价',
+    f_forms: '可拓展形态',
+    f_audience: '目标客群',
+    f_time: '规划时间',
+  };
+  const missing = [];
+  for(const k in requiredFields){
+    if(!d[k] || !d[k].trim()) missing.push(requiredFields[k]);
+  }
+  if(missing.length > 0){
+    showToast('❌ 请先补充必填项：' + missing.join('、'));
+    return;
+  }
+
+  // 软校验：推荐字段（客户独特之处 + 特别诉求 + 手动粘贴数据都为空 & 未上传文件）
+  const softMissing = [];
+  if(!d.f_culture || !d.f_culture.trim()) softMissing.push('客户独特之处');
+  if(!d.f_special || !d.f_special.trim()) softMissing.push('特别诉求');
+  const noExtraData = (!d.f_manual_data || !d.f_manual_data.trim()) && UPLOADED_FILES.length === 0;
+
+  if(softMissing.length >= 2 && noExtraData){
+    // 至少2个推荐字段空，且没有额外数据源 → 弹提醒
+    const ok = confirm(
+      '⚠️ 检测到以下推荐字段未填写：\n' +
+      softMissing.map(x => '· ' + x).join('\n') +
+      '\n\nAI 会自动推断兜底，但方案可能偏通用。\n\n是否仍然生成？（点"确定"继续，"取消"返回补充）'
+    );
+    if(!ok) return;
+  }
+
   render();
   showToast('⚡ 提示词已生成，请点击「📋 复制全文」');
 });
+
+// === 本地文件上传处理 ===
+const MAX_FULL_SIZE = 50 * 1024; // 50KB 全文注入阈值
+const HEAD_LEN = 3000; // 摘要前段
+const TAIL_LEN = 2000; // 摘要后段
+
+document.getElementById('f_files').addEventListener('change', async (e) => {
+  const files = Array.from(e.target.files);
+  const listEl = document.getElementById('f_files_list');
+
+  // 清空之前的上传
+  UPLOADED_FILES.length = 0;
+  listEl.innerHTML = '';
+
+  for(const file of files){
+    try{
+      const text = await file.text();
+      let content = text;
+      let truncated = false;
+      if(file.size > MAX_FULL_SIZE){
+        // 大文件裁剪为摘要
+        content = text.slice(0, HEAD_LEN) +
+                  '\n\n... [中间内容已省略，共省略 ' + (text.length - HEAD_LEN - TAIL_LEN) + ' 字符] ...\n\n' +
+                  text.slice(-TAIL_LEN);
+        truncated = true;
+      }
+      UPLOADED_FILES.push({
+        name: file.name,
+        size: file.size,
+        content: content,
+        truncated: truncated,
+      });
+
+      const li = document.createElement('div');
+      li.style.cssText = 'padding:4px 8px;margin-top:3px;background:var(--green-bg);border-left:2px solid var(--green);border-radius:2px;';
+      li.innerHTML = `✓ <b>${escapeHtml(file.name)}</b> (${(file.size/1024).toFixed(1)}KB${truncated?' · 已裁剪为摘要':' · 全文注入'})`;
+      listEl.appendChild(li);
+    } catch(err){
+      const li = document.createElement('div');
+      li.style.cssText = 'padding:4px 8px;margin-top:3px;background:#fef3e7;border-left:2px solid var(--accent);border-radius:2px;';
+      li.innerHTML = `✗ <b>${escapeHtml(file.name)}</b> 读取失败：${err.message}`;
+      listEl.appendChild(li);
+    }
+  }
+
+  render();
+});
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 
 // === Toast ===
 let toastTimer;
