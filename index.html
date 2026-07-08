@@ -367,7 +367,7 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
     </div>
     <div class="field">
       <label>品牌名<span class="req">*</span></label>
-      <input id="f_brand" type="text" placeholder="例：沙漠一号" value="沙漠一号">
+      <input id="f_brand" type="text" placeholder="例：客户 A / 品牌名" value="客户 A（云南咖啡品牌）">
     </div>
     <div class="field">
       <label>品牌阶段<span class="req">*</span></label>
@@ -386,25 +386,25 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
     </div>
     <div class="field">
       <label>核心原料<span class="req">*</span></label>
-      <input id="f_material" type="text" placeholder="例：虎坚果（油莎豆）" value="虎坚果（油莎豆）">
+      <input id="f_material" type="text" placeholder="例：云南小粒咖啡豆 / 虎坚果 / 有机燕麦" value="云南小粒咖啡豆">
     </div>
     <div class="field">
       <label>原料健康标签<span class="req">*</span><span class="opt">3-5 个，用 / 分隔</span></label>
-      <input id="f_tags" type="text" placeholder="例：低GI / 高膳食纤维 / 植物基" value="低GI / 高膳食纤维 / 植物基 / 高油酸 / 抗氧化">
+      <input id="f_tags" type="text" placeholder="例：0蔗糖 / 原产地健康 / 高山种植" value="0蔗糖 / 原产地健康 / 云南高山种植 / 天然坚果风味 / 微果酸">
     </div>
     <div class="field">
       <label>客户独特之处<span class="opt" style="color:var(--accent);font-weight:600">⭐推荐填写</span></label>
-      <input id="f_culture" type="text" placeholder="例：地中海原产 / 西班牙超级食物 / 千年食材 / 沙漠绿洲" value="地中海原产 / 西班牙超级食物 / 千年食材 / 沙漠绿洲">
+      <input id="f_culture" type="text" placeholder="例：云南本地产 / 家族茶园 / 非遗工艺 / 创始人故事" value="云南本地产 / 保山普洱德宏产区 / 云南少数民族文化 / 高山小粒咖啡风土">
       <div class="hint">这个客户和同品类竞品比，最不一样的地方是什么？<b>产地/工艺/创始人故事/文化基因</b>都可以——填了 AI 就有差异化锚点，不填也能跑（AI 会从品牌名和原料推断）。</div>
     </div>
     <div class="field">
       <label>现有 SKU<span class="req">*</span><span class="opt">多品用 / 分隔，AI 会主动避免重复推荐</span></label>
-      <input id="f_sku" type="text" placeholder="例：坚果酱（瓶装 200g） / 冷压坚果油 / 坚果粉冲饮" value="坚果酱（瓶装 200g）">
+      <input id="f_sku" type="text" placeholder="例：拿铁 / 黑咖 / 燕麦拿铁 / 生椰拿铁" value="拿铁 / 蓝山 / 黑咖 / 卡布 / 西梅 / 燕麦拿铁 / 生椰拿铁（速溶条装+搅拌杯套装）">
       <div class="hint">⚠️ 至少填 1 个，AI 会把这些当作「已饱和方向」——推荐的口味/形态/场景若与现有 SKU 重合度过高，会自动升级维度或替换方向。</div>
     </div>
     <div class="field">
       <label>现有客单价<span class="req">*</span></label>
-      <input id="f_price" type="text" placeholder="例：80-150 元" value="80-150 元">
+      <input id="f_price" type="text" placeholder="例：39.9-89.9 元" value="39.9-89.9 元（下沉囤货带）">
     </div>
 
     <!-- 4. 生产能力 -->
@@ -415,7 +415,7 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
     </div>
     <div class="field">
       <label>可拓展形态<span class="req">*</span></label>
-      <input id="f_forms" type="text" placeholder="例：油脂 / 粉剂 / 酱类 / 饮品" value="油脂 / 粉剂 / 饮品 / 烘焙原料 / 能量棒 / 礼盒组合">
+      <input id="f_forms" type="text" placeholder="例：粉剂 / 饮品 / 冻干罐装 / 咖啡糖 / 礼盒" value="粉剂 / 饮品 / 冻干罐装 / 咖啡糖 / 礼盒组合">
       <div class="chips">
         <span class="chip green" data-append="f_forms">油脂</span>
         <span class="chip green" data-append="f_forms">粉剂</span>
@@ -429,11 +429,11 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
     </div>
     <div class="field">
       <label>产能限制<span class="opt">选填</span></label>
-      <input id="f_limit" type="text" placeholder="例：油脂产能优先 / 粉剂需外协" value="油脂产能优先">
+      <input id="f_limit" type="text" placeholder="例：粉剂产能成熟 / 冻干需外协" value="速溶粉产线成熟，自有工厂年产3万吨">
     </div>
     <div class="field">
       <label>食品安全资质<span class="opt">选填</span></label>
-      <input id="f_cert" type="text" placeholder="例：已有 SC / 婴幼儿辅食待办" value="已有 SC，婴幼儿辅食待办">
+      <input id="f_cert" type="text" placeholder="例：已有 SC / 糖果生产线" value="已有 SC，具备糖果生产线">
     </div>
 
     <!-- 5. 客群与目标 -->
@@ -444,7 +444,7 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
     </div>
     <div class="field">
       <label>目标客群<span class="req">*</span><span class="opt">可多选</span></label>
-      <input id="f_audience" type="text" placeholder="例：25-40 岁女性 / 健身族 / 中老年送礼" value="25-40 岁女性 / 健身族 / 妈妈群 / 中老年送礼 / 控糖人群">
+      <input id="f_audience" type="text" placeholder="例：25-40 岁女性 / 悦己尝鲜派 / 高端白领" value="25-40 岁女性 / 悦己尝鲜派 / 妈妈群 / 高端白领 / 差旅人群">
       <div class="chips">
         <span class="chip" data-append="f_audience">25-40 岁女性</span>
         <span class="chip" data-append="f_audience">健身族</span>
@@ -457,7 +457,7 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
     </div>
     <div class="field">
       <label>特别诉求<span class="opt" style="color:var(--accent);font-weight:600">⭐推荐填写</span></label>
-      <input id="f_special" type="text" placeholder="点击下方 chip 一键填入，也可以自己写" value="重点突出中老年送父母线">
+      <input id="f_special" type="text" placeholder="点击下方 chip 一键填入，也可以自己写" value="🎯 突出产地风土">
       <div class="chips">
         <span class="chip gold" data-target="f_special">🎯 突出产地风土</span>
         <span class="chip gold" data-target="f_special">💡 主攻应季场景</span>
@@ -474,8 +474,8 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
       <label>价格带定位<span class="req">*</span></label>
       <select id="f_band">
         <option value="性价比">性价比（30-80 元）</option>
-        <option value="中端">中端（80-200 元）</option>
-        <option value="中高端" selected>中高端（200-500 元）</option>
+        <option value="中端" selected>中端（80-200 元）</option>
+        <option value="中高端">中高端（200-500 元）</option>
         <option value="高端礼品级">高端礼品级（500+ 元）</option>
       </select>
     </div>
@@ -488,11 +488,11 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
     </div>
     <div class="field">
       <label>规划时间<span class="req">*</span></label>
-      <input id="f_time" type="text" placeholder="例：26 全年 / 26 Q4 春节备战" value="26 全年">
+      <input id="f_time" type="text" placeholder="例：26 Q3-Q4 全年 / 26 Q4 双11" value="26 Q3-Q4 全年">
     </div>
     <div class="field">
       <label>预算量级<span class="opt">选填</span></label>
-      <input id="f_budget" type="text" placeholder="例：单品研发 50 万内" value="单品研发 50 万内">
+      <input id="f_budget" type="text" placeholder="例：单品研发 30-50 万" value="单品研发 30-50 万">
     </div>
 
     <!-- 7. 产出定制（NEW · 销售自定义产能）-->
@@ -503,11 +503,11 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
     </div>
     <div class="field">
       <label>SKU 拓品矩阵数量<span class="req">*</span></label>
-      <input id="f_sku_count" type="number" min="5" max="15" value="8" placeholder="默认 8（建议范围 5-15）">
+      <input id="f_sku_count" type="number" min="5" max="15" value="10" placeholder="默认 8（建议范围 5-15）">
     </div>
     <div class="field">
       <label>P0 优先级单品数量<span class="req">*</span></label>
-      <input id="f_p0_count" type="number" min="1" max="5" value="2" placeholder="默认 2（建议范围 1-5）">
+      <input id="f_p0_count" type="number" min="1" max="5" value="3" placeholder="默认 2（建议范围 1-5）">
     </div>
     <div class="field">
       <label>营销主线数量<span class="req">*</span></label>
@@ -548,7 +548,7 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
 <div class="toast" id="toast">✅ 已复制到剪贴板</div>
 
 <script>
-// === 默认示例值（沙漠一号 / 虎坚果） ===
+// === 默认示例值（脱敏 · 云南咖啡品牌参考案例） ===
 const BASELINE_PRESETS = {
   q3: 'https://winglee777.github.io/q3-category-trend/longimage.html\nhttps://winglee777.github.io/q3-category-trend/api/data.md',
   q4: 'https://winglee777.github.io/q4-category-trend/longimage.html\nhttps://winglee777.github.io/q4-category-trend/api/data.md',
@@ -559,23 +559,23 @@ const BASELINE_PRESETS = {
 const DEFAULTS = {
   f_baselines: BASELINE_PRESETS.both,
   f_manual_data: '',
-  f_brand: '沙漠一号',
+  f_brand: '客户 A（云南咖啡品牌）',
   f_stage: '成长期',
-  f_material: '虎坚果（油莎豆）',
-  f_tags: '低GI / 高膳食纤维 / 植物基 / 高油酸 / 抗氧化',
-  f_culture: '地中海原产 / 西班牙超级食物 / 千年食材 / 沙漠绿洲',
-  f_sku: '坚果酱（瓶装 200g）',
-  f_price: '80-150 元',
-  f_forms: '油脂 / 粉剂 / 饮品 / 烘焙原料 / 能量棒 / 礼盒组合',
-  f_limit: '油脂产能优先',
-  f_cert: '已有 SC，婴幼儿辅食待办',
-  f_audience: '25-40 岁女性 / 健身族 / 妈妈群 / 中老年送礼 / 控糖人群',
-  f_special: '重点突出中老年送父母线',
-  f_band: '中高端',
-  f_time: '26 全年',
-  f_budget: '单品研发 50 万内',
-  f_sku_count: '8',
-  f_p0_count: '2',
+  f_material: '云南小粒咖啡豆',
+  f_tags: '0蔗糖 / 原产地健康 / 云南高山种植 / 天然坚果风味 / 微果酸',
+  f_culture: '云南本地产 / 保山普洱德宏产区 / 云南少数民族文化 / 高山小粒咖啡风土',
+  f_sku: '拿铁 / 蓝山 / 黑咖 / 卡布 / 西梅 / 燕麦拿铁 / 生椰拿铁（速溶条装+搅拌杯套装）',
+  f_price: '39.9-89.9 元（下沉囤货带）',
+  f_forms: '粉剂 / 饮品 / 冻干罐装 / 咖啡糖 / 礼盒组合',
+  f_limit: '速溶粉产线成熟，自有工厂年产3万吨',
+  f_cert: '已有 SC，具备糖果生产线',
+  f_audience: '25-40 岁女性 / 悦己尝鲜派 / 妈妈群 / 高端白领 / 差旅人群',
+  f_special: '🎯 突出产地风土',
+  f_band: '中端',
+  f_time: '26 Q3-Q4 全年',
+  f_budget: '单品研发 30-50 万',
+  f_sku_count: '10',
+  f_p0_count: '3',
   f_marketing_count: '3',
   f_tag_count: '8',
 };
@@ -791,7 +791,7 @@ function reset(){
     if(el) el.value = DEFAULTS[k];
   }
   render();
-  showToast('↺ 已重置为虎坚果示例');
+  showToast('↺ 已重置为参考示例（云南咖啡品牌）');
 }
 
 // === Chip 点击 ===
