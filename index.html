@@ -96,7 +96,7 @@ html,body{
 
 /* === MAIN LAYOUT === */
 .main{
-  display:grid;grid-template-columns:520px 1fr;
+  display:grid;grid-template-columns:minmax(560px, 640px) 1fr;
   gap:0;min-height:calc(100vh - 220px);
 }
 .left{
@@ -158,17 +158,17 @@ html,body{
 }
 .tip-btn:hover{background:var(--gold);color:#fff}
 .tip-body{
-  display:none;position:absolute;
-  left:0;top:calc(100% + 6px);
-  min-width:280px;max-width:360px;z-index:10;
-  padding:10px 12px;
+  display:none;position:fixed;
+  width:320px;z-index:9999;
+  padding:12px 14px;
   background:#fdf6e3;
   border:1px solid var(--gold);
   border-left:3px solid var(--gold);
   border-radius:3px;
-  font-size:11.5px;color:var(--sub);line-height:1.6;font-weight:400;
-  box-shadow:0 4px 16px rgba(0,0,0,.08);
+  font-size:11.5px;color:var(--sub);line-height:1.65;font-weight:400;
+  box-shadow:0 8px 24px rgba(0,0,0,.15);
   white-space:normal;
+  pointer-events:none;
 }
 .tip-body b{color:var(--ink);font-weight:700}
 .tip-body code{
@@ -1032,18 +1032,51 @@ function escapeHtml(s){
   return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-// === Tip 点击切换（移动端友好） ===
+// === Tip 动态定位（fixed 定位气泡跟随按钮位置） ===
+function positionTip(tipEl){
+  const btn = tipEl.querySelector('.tip-btn');
+  const body = tipEl.querySelector('.tip-body');
+  if(!btn || !body) return;
+  const rect = btn.getBoundingClientRect();
+  const bodyW = 320; // 与 CSS width 保持一致
+  const gap = 6;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+
+  // 优先向下右展开；如果右边空间不够，改为向左展开
+  let left = rect.left;
+  if(left + bodyW + 20 > vw){
+    left = rect.right - bodyW;
+  }
+  if(left < 8) left = 8;
+
+  let top = rect.bottom + gap;
+  // 大概估气泡高度200，如果超出视口就向上展开
+  if(top + 220 > vh){
+    top = rect.top - 220 - gap;
+    if(top < 8) top = 8;
+  }
+  body.style.left = left + 'px';
+  body.style.top = top + 'px';
+}
+
 document.querySelectorAll('.tip').forEach(t => {
+  // hover 时更新位置
+  t.addEventListener('mouseenter', () => positionTip(t));
+  // 点击切换（移动端）
   t.addEventListener('click', e => {
     e.stopPropagation();
-    // 关掉其他打开的
     document.querySelectorAll('.tip.open').forEach(o => { if(o !== t) o.classList.remove('open'); });
+    positionTip(t);
     t.classList.toggle('open');
   });
 });
 document.addEventListener('click', () => {
   document.querySelectorAll('.tip.open').forEach(o => o.classList.remove('open'));
 });
+window.addEventListener('scroll', () => {
+  document.querySelectorAll('.tip.open').forEach(t => positionTip(t));
+}, true);
 
 // === Toast ===
 let toastTimer;
