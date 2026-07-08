@@ -198,26 +198,56 @@ html,body{
 }
 .field .hint b{color:var(--sub);font-weight:600}
 .field .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
-/* radio group */
+/* radio group —— 注意：.radio-item 是 label 元素，需要完整重置 .field label 的继承样式 */
 .radio-group{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
-.radio-item{
-  display:flex;align-items:flex-start;gap:10px;
-  cursor:pointer;padding:10px 14px;
-  border:1.5px solid var(--border);border-radius:8px;
+.field .radio-item{
+  /* 重置 .field label 的 display:flex align-items:center */
+  display:flex !important;
+  align-items:flex-start !important;
+  flex-direction:row !important;
+  gap:10px;
+  cursor:pointer;
+  padding:10px 14px;
+  border:1.5px solid var(--border);
+  border-radius:8px;
   transition:border-color .15s,background .15s;
-  /* 关键：不要 width:100% + box-sizing，用 margin 来撑满 */
-  margin-left:0;margin-right:0;
+  margin-bottom:0;
+  font-weight:normal;
+  /* 撑满父容器 */
+  width:100%;
+  box-sizing:border-box;
 }
-.radio-item:has(input:checked){border-color:var(--accent);background:var(--accent-bg);}
-.radio-item input[type=radio]{margin-top:3px;accent-color:var(--accent);flex-shrink:0;width:16px;height:16px;}
+.field .radio-item:has(input:checked){border-color:var(--accent);background:var(--accent-bg);}
+.field .radio-item input[type=radio]{
+  margin-top:2px;
+  accent-color:var(--accent);
+  flex-shrink:0;
+  width:16px;height:16px;
+}
 .radio-label{
-  display:flex;flex-direction:column;gap:3px;
-  /* 关键：让文字在剩余空间内正常换行，不溢出 */
-  flex:1 1 0;min-width:0;
-  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  gap:3px;
+  flex:1 1 0;
+  min-width:0;
 }
-.radio-label b{font-size:13px;color:var(--fg);white-space:normal;word-break:normal;overflow-wrap:break-word;}
-.radio-desc{font-size:11px;color:var(--muted);line-height:1.5;white-space:normal;word-break:normal;overflow-wrap:break-word;}
+.radio-label b{
+  font-size:13px;
+  color:var(--ink);
+  font-weight:700;
+  white-space:normal;
+  word-break:normal;
+  overflow-wrap:break-word;
+  line-height:1.4;
+}
+.radio-desc{
+  font-size:11px;
+  color:var(--mute);
+  line-height:1.5;
+  white-space:normal;
+  word-break:normal;
+  overflow-wrap:break-word;
+}
 .field .chip{
   display:inline-block;padding:3px 9px;
   font-size:11px;font-weight:600;
