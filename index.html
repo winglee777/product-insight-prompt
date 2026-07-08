@@ -198,6 +198,14 @@ html,body{
 }
 .field .hint b{color:var(--sub);font-weight:600}
 .field .chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:5px}
+/* radio group */
+.radio-group{display:flex;flex-direction:column;gap:8px;margin-top:4px;width:100%;}
+.radio-item{display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;transition:border-color .15s,background .15s;width:100%;box-sizing:border-box;}
+.radio-item:has(input:checked){border-color:var(--accent);background:var(--accent-bg);}
+.radio-item input[type=radio]{margin-top:3px;accent-color:var(--accent);flex-shrink:0;}
+.radio-label{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;word-break:break-all;overflow-wrap:anywhere;}
+.radio-label b{font-size:13px;color:var(--fg);white-space:normal;}
+.radio-desc{font-size:11px;color:var(--muted);white-space:normal;line-height:1.5;}
 .field .chip{
   display:inline-block;padding:3px 9px;
   font-size:11px;font-weight:600;
@@ -321,9 +329,6 @@ html,body{
   <div class="eyebrow">CUSTOMER PRODUCT INSIGHT · ONE-CLICK GENERATOR</div>
   <h1>商家开品洞察 <span class="h">提示词生成器</span></h1>
   <p class="lead">
-    <b>🌐 面状 × 🎯 点状</b>——让一份行业趋势报告产生两种价值：
-    面上做<b>拓客拓品标准物料</b>，点上做<b>单客户定制开品方案</b>。
-    <br>
     粘贴<b>任意一份行业趋势报告网址</b>（已内嵌：食品饮料行业 25Q3 / 25Q4 趋势报告）+ 填写客户信息 →
     一键生成专属提示词 → 喂给 <b>任意支持联网的 AI 工具</b>（CodeBuddy / Claude / Codex）→
     得到独家《开品洞察 OnePage》。
@@ -444,8 +449,8 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
       <input id="f_material" type="text" placeholder="例：云南小粒咖啡豆 / 虎坚果 / 有机燕麦" value="云南小粒咖啡豆">
     </div>
     <div class="field">
-      <label>原料健康标签<span class="req">*</span><span class="opt">3-5 个，用 / 分隔</span></label>
-      <input id="f_tags" type="text" placeholder="例：0蔗糖 / 原产地健康 / 高山种植" value="0蔗糖 / 原产地健康 / 云南高山种植 / 天然坚果风味 / 微果酸">
+      <label>原料卖点标签<span class="req">*</span><span class="opt">3-5 个，用 / 分隔</span></label>
+      <input id="f_tags" type="text" placeholder="例：0蔗糖 / 经典番茄 / 意式风味 / 高山种植 / 天然发酵" value="0蔗糖 / 原产地健康 / 云南高山种植 / 天然坚果风味 / 微果酸">
     </div>
     <div class="field">
       <label>
@@ -467,19 +472,95 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
     </div>
     <div class="field">
       <label>
-        现有 SKU<span class="req">*</span>
+        主线产品 SKU<span class="req">*</span>
         <span class="tip">
           <span class="tip-btn">⚠️ 去重逻辑</span>
           <span class="tip-body">
-            <b>至少填 1 个，多品用 / 分隔（无上限）</b><br><br>
-            AI 会把这些当作「<b>已饱和方向</b>」，推荐时逐条比对：<br>
-            · 口味/形态/场景 与现有 SKU 重合度 &gt;60% → 自动升级维度<br>
-            · 如"客户已有黑咖" → 推"云南花香黑咖"而非"黑咖"<br>
+            <b>填已跑通、有量的核心产品，多品用 / 分隔</b><br><br>
+            主线深耕时：AI 以这些为基底做拓展<br>
+            副线突破 / 新品类开拓时：AI 把这些当「<b>已饱和禁区</b>」，推荐时逐条比对：<br>
+            · 口味/形态/场景 与主线 SKU 重合度 &gt;60% → 自动升级维度<br>
             · 方案里会显式列出「已避开的方向」
           </span>
         </span>
       </label>
-      <input id="f_sku" type="text" placeholder="例：拿铁 / 黑咖 / 燕麦拿铁 / 生椰拿铁" value="拿铁 / 蓝山 / 黑咖 / 卡布 / 西梅 / 燕麦拿铁 / 生椰拿铁（速溶条装+搅拌杯套装）">
+      <input id="f_sku" type="text" placeholder="例：拿铁 / 黑咖 / 燕麦拿铁（已跑通的主力品）" value="拿铁 / 蓝山 / 黑咖 / 卡布 / 西梅 / 燕麦拿铁 / 生椰拿铁（速溶条装+搅拌杯套装）">
+    </div>
+    <div class="field">
+      <label>
+        待发展产品
+        <span class="opt">有但未跑通 · 选填</span>
+        <span class="tip">
+          <span class="tip-btn">💡 什么情况填</span>
+          <span class="tip-body">
+            <b>已有但弱、想做大或想判断是否值得继续的产品线</b><br><br>
+            · 例：主推意面，但也有披萨，披萨没跑起来<br>
+            · 例：有主线咖啡豆，但挂耳包卖得很一般<br><br>
+            填了之后 AI 会先做「诊断」（为什么没跑通），<br>再结合你的开品目标给出是发力还是放弃的建议。<br>
+            <b>不填则视为无副线，AI 只围绕主线输出。</b>
+          </span>
+        </span>
+      </label>
+      <input id="f_sku_sub" type="text" placeholder="例：披萨 / 意式焗饭（有但未跑通的副线）" value="">
+    </div>
+    <div class="field">
+      <label>本次开品核心目标<span class="req">*</span></label>
+      <div class="radio-group" id="rg_goal">
+        <label class="radio-item">
+          <input type="radio" name="f_goal" value="主线深耕" checked>
+          <span class="radio-label">
+            <b>主线深耕</b>
+            <span class="radio-desc">围绕现有主力产品，拓口味 / 场景 / 形态</span>
+          </span>
+        </label>
+        <label class="radio-item">
+          <input type="radio" name="f_goal" value="副线突破">
+          <span class="radio-label">
+            <b>副线突破</b>
+            <span class="radio-desc">让已有但未跑通的品找到爆发路径</span>
+          </span>
+        </label>
+        <label class="radio-item">
+          <input type="radio" name="f_goal" value="新品类开拓">
+          <span class="radio-label">
+            <b>新品类开拓</b>
+            <span class="radio-desc">主副线之外，探索全新方向</span>
+          </span>
+        </label>
+      </div>
+    </div>
+    <div class="field" id="field_sub_direction" style="display:none">
+      <label>副线发展方向<span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="radio-item">
+          <input type="radio" name="f_sub_direction" value="多口味多场景" checked>
+          <span class="radio-label">
+            <b>多口味多场景</b>
+            <span class="radio-desc">同品类做深——更多口味、更多使用场景</span>
+          </span>
+        </label>
+        <label class="radio-item">
+          <input type="radio" name="f_sub_direction" value="形态升级">
+          <span class="radio-label">
+            <b>形态升级</b>
+            <span class="radio-desc">同产品换形态——冷冻 / 预制 / 即食化</span>
+          </span>
+        </label>
+        <label class="radio-item">
+          <input type="radio" name="f_sub_direction" value="客群迁移">
+          <span class="radio-label">
+            <b>客群迁移</b>
+            <span class="radio-desc">换人群——家庭装 / 礼品场景 / 年轻客群</span>
+          </span>
+        </label>
+        <label class="radio-item">
+          <input type="radio" name="f_sub_direction" value="主副线组合联动">
+          <span class="radio-label">
+            <b>主副线组合联动</b>
+            <span class="radio-desc">捆绑销售——主线带动副线拉高客单</span>
+          </span>
+        </label>
+      </div>
     </div>
     <div class="field">
       <label>现有客单价<span class="req">*</span></label>
@@ -675,13 +756,23 @@ const UPLOADED_FILES = []; // {name, size, content, truncated}
 
 // === 提示词模板 ===
 function buildPrompt(d){
+  const goalLabel = d.f_goal || '主线深耕';
+  const subDir = d.f_sub_direction || '';
+  const subSku = d.f_sku_sub || '';
+  const subSkuLine = subSku ? `  待发展产品（有但未跑通）: "${subSku}"` : `  待发展产品: （未填写，视为无副线）`;
+  const subDirLine = goalLabel === '副线突破' && subDir
+    ? `  副线发展方向: "${subDir}"`
+    : '';
+
   const customerInfo = `客户信息:
   品牌名: "${d.f_brand}"
   品牌阶段: "${d.f_stage}"
   核心原料: "${d.f_material}"
-  原料健康标签: "${d.f_tags}"
-  客户独特之处: "${d.f_culture || '（用户未填写，请你从品牌名/核心原料/健康标签主动推断1-2个差异化亮点）'}"
-  现有 SKU: "${d.f_sku}"
+  原料卖点标签: "${d.f_tags}"
+  客户独特之处: "${d.f_culture || '（用户未填写，请你从品牌名/核心原料/卖点标签主动推断1-2个差异化亮点）'}"
+  主线产品 SKU: "${d.f_sku}"
+${subSkuLine}
+  本次开品核心目标: "${goalLabel}"${subDirLine ? '\n' + subDirLine : ''}
   现有客单价: "${d.f_price}"
   可拓展形态: "${d.f_forms}"
   产能限制: "${d.f_limit || '待定'}"
@@ -809,11 +900,32 @@ ${marketingDesc}：
 - 若字段为空：请主动从「品牌名+核心原料+健康标签」推断1-2个差异化亮点，并在方案开头明确标注"（基于XX推断，如不准确请回填「客户独特之处」字段）"
 - 检查标准：如果这份方案换个同品类客户也能用 = 独特性不够，必须重写
 
-【现有 SKU = 禁区（重要！）】
-读取"现有 SKU"字段（当前为「${d.f_sku}」）——AI 推荐时必须逐条比对：
-- 推荐的口味/形态/场景若与现有 SKU 重合度 >60% → 必须升级维度（如"客户已有黑咖" → 推"云南花香黑咖"而非"黑咖"）
-- 最终方案里必须显式列一段"已避开的方向：客户现有 XX，故不推 YY；改推 ZZ 作为升级方向"
-- 检查标准：如果推荐单品和现有 SKU 只是"改个规格/换个包装"级别 = 不算拓品，必须替换
+【产品线策略 · 按开品目标路由（重要！）】
+
+本次开品目标：「${goalLabel}」${subDir ? '  副线方向：「' + subDir + '」' : ''}
+主线产品：「${d.f_sku}」
+待发展产品：「${subSku || '无'}」
+
+▶ 若目标 = 「主线深耕」：
+- 以主线产品为基底，做口味 × 场景 × 形态三维拓展
+- 推荐方向必须与主线 SKU 形成「升维」（非重复，是延伸）
+- 若有待发展产品，仅在"组合联动"维度提及，不作为本次重点
+- 方案最后列：「已避开的同质方向」
+
+▶ 若目标 = 「副线突破」：
+- 第一步：先做「副线诊断」——「${subSku || '待发展产品'}」目前未跑通的可能原因（口味/定价/场景/内容/时机 各1-2句推断）
+- 第二步：按副线方向「${subDir || '多口味多场景'}」给出突破路径
+  · 多口味多场景 → 口味/场景维度拓展，每个方向对位基线爆款
+  · 形态升级 → 从现有形态出发，推冷冻/预制/即食化等升级方向
+  · 客群迁移 → 分析当前客群 vs 新客群差异，推适配的产品改造方向
+  · 主副线组合联动 → 设计主线带动副线的捆绑/套餐/差异化定价方案
+- 主线产品「${d.f_sku}」在本次输出中作为「联动参照」，不作为推荐重点
+- 方案最后列：「副线诊断结论」+「建议发力 or 放弃的理由」
+
+▶ 若目标 = 「新品类开拓」：
+- 主线「${d.f_sku}」和待发展产品「${subSku || '无'}」均作为禁区逐条比对，推荐时避开重合度 >60% 的方向
+- 在品牌原料/客群/独特之处基础上，探索全新品类方向
+- 方案最后列：「已避开的方向（主线+副线）」及改推的全新方向
 
 【外部信息补充 · 有边界的发散（重要！）】
 允许你使用 web_search，但**仅服务于以下 3 类**，其余场景禁止发散：
@@ -841,6 +953,8 @@ ${marketingDesc}：
 □ 是否 P0 单品都标注了对位基线报告的具体爆款+GMV？
 □ ${marketingCount} 条营销主线之间是否有明显区隔（客群/场景/口味不重复）？
 □ 是否每条 web_search 引用都标注了 (web_search · 来源) ？
+□ 开品目标是「副线突破」时，是否先给出了「副线诊断」（为什么没跑通）再给解法？
+□ 开品目标是「主线深耕」时，推荐单品是否都是对主线的「升维」而非重复？
 
 
 【输出八条铁律】
@@ -863,7 +977,27 @@ function collectData(){
     const el = document.getElementById(k);
     d[k] = el ? el.value.trim() : '';
   }
+  // radio 字段单独读取
+  const goalEl = document.querySelector('input[name="f_goal"]:checked');
+  d.f_goal = goalEl ? goalEl.value : '主线深耕';
+  const subDirEl = document.querySelector('input[name="f_sub_direction"]:checked');
+  d.f_sub_direction = subDirEl ? subDirEl.value : '';
+  d.f_sku_sub = (document.getElementById('f_sku_sub') || {value:''}).value.trim();
   return d;
+}
+
+// 副线突破时显示副线方向
+function initGoalToggle(){
+  document.querySelectorAll('input[name="f_goal"]').forEach(r => {
+    r.addEventListener('change', () => {
+      const show = r.value === '副线突破' && r.checked;
+      document.getElementById('field_sub_direction').style.display = show ? '' : 'none';
+      render();
+    });
+  });
+  document.querySelectorAll('input[name="f_sub_direction"]').forEach(r => {
+    r.addEventListener('change', render);
+  });
 }
 
 // === 渲染提示词 ===
@@ -945,8 +1079,8 @@ document.getElementById('btnGenerate').addEventListener('click', () => {
     f_baselines: '参考报告网址',
     f_brand: '品牌名',
     f_material: '核心原料',
-    f_tags: '原料健康标签',
-    f_sku: '现有 SKU（至少 1 个）',
+    f_tags: '原料卖点标签',
+    f_sku: '主线产品 SKU（至少 1 个）',
     f_price: '现有客单价',
     f_forms: '可拓展形态',
     f_audience: '目标客群',
@@ -1089,6 +1223,7 @@ function showToast(msg){
 }
 
 // === 初始渲染 ===
+initGoalToggle();
 render();
 </script>
 </body>
