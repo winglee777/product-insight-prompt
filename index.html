@@ -132,12 +132,50 @@ html,body{
 }
 .field{margin-bottom:14px}
 .field label{
-  display:block;
-  font-size:12px;font-weight:700;color:var(--ink);
-  margin-bottom:5px;
+  display:flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:900;color:var(--ink);
+  margin-bottom:6px;
+  padding-left:8px;
+  border-left:3px solid var(--accent);
+  line-height:1.2;
 }
-.field label .req{color:var(--accent);margin-left:3px}
-.field label .opt{color:var(--mute);font-size:10px;font-weight:400;margin-left:5px}
+.field label .req{color:var(--accent);margin-left:2px;font-weight:900}
+.field label .opt{color:var(--mute);font-size:10px;font-weight:500;margin-left:auto}
+.field label .opt.rec{color:var(--accent);font-weight:700;background:var(--accent-bg);padding:2px 6px;border-radius:2px;font-size:10px}
+
+/* Tip 折叠组件：默认只显示 "💡 说明" 按钮，hover/点击才展开 */
+.tip{
+  position:relative;display:inline-block;
+  margin-left:6px;vertical-align:middle;
+}
+.tip-btn{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:10px;font-weight:600;color:var(--gold);
+  background:var(--gold-bg);
+  padding:2px 7px;border-radius:2px;cursor:help;
+  user-select:none;
+  transition:background .15s;
+}
+.tip-btn:hover{background:var(--gold);color:#fff}
+.tip-body{
+  display:none;position:absolute;
+  left:0;top:calc(100% + 6px);
+  min-width:280px;max-width:360px;z-index:10;
+  padding:10px 12px;
+  background:#fdf6e3;
+  border:1px solid var(--gold);
+  border-left:3px solid var(--gold);
+  border-radius:3px;
+  font-size:11.5px;color:var(--sub);line-height:1.6;font-weight:400;
+  box-shadow:0 4px 16px rgba(0,0,0,.08);
+  white-space:normal;
+}
+.tip-body b{color:var(--ink);font-weight:700}
+.tip-body code{
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  background:rgba(184,134,11,.12);padding:1px 4px;border-radius:2px;
+}
+.tip:hover .tip-body,.tip.open .tip-body{display:block}
 .field input,.field textarea,.field select{
   width:100%;
   padding:8px 12px;
@@ -314,49 +352,66 @@ html,body{
       <div class="desc">让 AI 自己读，不预设</div>
     </div>
     <div class="field">
-      <label>参考报告网址<span class="req">*</span><span class="opt">多个用换行分隔 · 默认已带 AI 友好兜底地址</span></label>
+      <label>
+        参考报告网址<span class="req">*</span>
+        <span class="tip">
+          <span class="tip-btn">💡 说明</span>
+          <span class="tip-body">
+            <b>为什么有 4 个网址？</b><br>
+            · <code>longimage.html</code> — 给人类看的交互式报告（数据 JS 动态加载）<br>
+            · <code>api/data.md</code> — 给 <b>AI agent 兜底</b>的静态文本版（爆款 SKU / 关键词全在里面）<br>
+            · 双投递确保任何 AI agent（Claude/GPT/Codex/Gemini）拿到提示词都能正常工作<br>
+            <br>
+            <b>用法</b>：可粘贴任意行业趋势报告网址（视频号小店食饮品类）。不限于本团队产出，也可以是其他赛道（茶饮/美妆/家清等）的趋势报告。多个网址用换行分隔。
+          </span>
+        </span>
+      </label>
       <textarea id="f_baselines" rows="5" placeholder="粘贴一个或多个行业趋势报告的网址，AI 会自动访问并提取趋势数据作为基线">https://winglee777.github.io/q3-category-trend/longimage.html
 https://winglee777.github.io/q3-category-trend/api/data.md
 https://winglee777.github.io/q4-category-trend/longimage.html
 https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
-      <div style="font-size:11.5px;color:var(--mute);line-height:1.65;margin:6px 0 8px;padding:8px 12px;background:#fdf6e3;border-left:3px solid var(--gold);">
-        💡 <b>为什么有 4 个网址？</b><br>
-        · <code>longimage.html</code> 是给人类看的交互式报告（数据 JS 动态加载）<br>
-        · <code>api/data.md</code> 是给 <b>AI agent 兜底</b>的静态文本版（爆款 SKU / 关键词全在里面）<br>
-        · 双投递确保 <b>任何 AI agent（Claude/GPT/Codex/Gemini）拿到提示词都能正常工作</b>
-      </div>
       <div class="chips">
         <span class="chip" data-baseline="q3">📊 仅 25Q3 报告</span>
         <span class="chip" data-baseline="q4">📊 仅 25Q4 报告</span>
         <span class="chip" data-baseline="both">📊 Q3 + Q4 双季（推荐）</span>
         <span class="chip" data-baseline="ai_only">🤖 仅 AI 兜底版（最稳）</span>
       </div>
-      <div class="hint"><b>说明</b>：可粘贴任意行业趋势报告网址（视频号小店食饮品类）。不限于本团队产出，也可以是其他赛道（茶饮/美妆/家清等）的趋势报告。</div>
     </div>
 
     <div class="field">
       <label>
         手动粘贴报告数据
-        <span class="opt">选填 · 兜底中的兜底</span>
+        <span class="opt">选填</span>
+        <span class="tip">
+          <span class="tip-btn">💡 什么时候用</span>
+          <span class="tip-body">
+            <b>兜底中的兜底</b>：当 AI 工具联网受限 / 网址被墙 / 报告页失效时用。<br><br>
+            你跑 AI 时如果发现产出里"对位锚点都很泛"或者"P0 单品 GMV 数字写错"——说明 AI 没拿到颗粒数据，把报告里的 TOP 爆款表格、关键词列表、insight 段落<b>直接粘贴到这里</b>，AI 会把这段数据作为<b>最高优先级</b>的基线。
+          </span>
+        </span>
       </label>
-      <textarea id="f_manual_data" rows="4" placeholder="（选填）当 AI 工具联网受限 / 网址被墙 / 报告页失效时，可直接把报告里的 TOP 爆款表格、关键词列表、insight 段落复制粘贴到这里。AI 会把这段数据作为最高优先级的基线。"></textarea>
-      <div style="font-size:11.5px;color:var(--mute);line-height:1.65;margin:6px 0 0;">
-        💡 <b>什么时候用</b>：你跑 AI 时如果发现产出里"对位锚点都很泛"或者"P0 单品 GMV 数字写错"——说明 AI 没拿到颗粒数据，把报告里的爆款表格直接粘贴过来，AI 立刻就能写实。
-      </div>
+      <textarea id="f_manual_data" rows="3" placeholder="（选填）粘贴报告里的 TOP 爆款表格 / 关键词列表 / insight 段落"></textarea>
     </div>
 
     <div class="field">
       <label>
         📎 本地文件上传
-        <span class="opt">选填 · 客户档案 / 竞品调研 / 内部访谈纪要</span>
+        <span class="opt">选填</span>
+        <span class="tip">
+          <span class="tip-btn">💡 格式说明</span>
+          <span class="tip-body">
+            <b>用途</b>：注入客户独家信息（非公开数据）<br>
+            · 客户 CRM 档案 / 内部客户访谈纪要 / 品牌手册 / 竞品调研笔记 都可以传<br><br>
+            <b>支持格式</b>：<code>.md</code> / <code>.txt</code> / <code>.csv</code>（多文件）<br>
+            <b>大小规则</b>：<br>
+            · &lt;50KB → 全文注入 Prompt<br>
+            · &gt;50KB → 自动裁剪为摘要（前3000字+后2000字）<br>
+            · 单文件建议 &lt;100KB
+          </span>
+        </span>
       </label>
-      <input type="file" id="f_files" multiple accept=".md,.txt,.csv" style="padding:6px 8px;background:#fafaf6;border:1px dashed var(--bd);border-radius:3px;font-size:12px;cursor:pointer;">
+      <input type="file" id="f_files" multiple accept=".md,.txt,.csv" style="padding:6px 8px;background:#fafaf6;border:1px dashed var(--bd);border-radius:3px;font-size:12px;cursor:pointer;width:100%;">
       <div id="f_files_list" style="font-size:11px;color:var(--sub);margin-top:6px;line-height:1.6"></div>
-      <div style="font-size:11.5px;color:var(--mute);line-height:1.65;margin:6px 0 0;padding:8px 12px;background:#e8f3ee;border-left:3px solid var(--green);">
-        📁 <b>支持格式</b>：<code>.md</code> / <code>.txt</code> / <code>.csv</code>（多文件，单文件建议 &lt;100KB）<br>
-        · 客户 CRM 档案、内部客户访谈纪要、品牌手册、竞品调研笔记都可以传<br>
-        · &lt;50KB 会全文注入 Prompt，&gt;50KB 会自动裁剪为摘要（前3000字+后2000字）
-      </div>
     </div>
 
     <!-- 2. 基本信息 -->
@@ -393,14 +448,38 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
       <input id="f_tags" type="text" placeholder="例：0蔗糖 / 原产地健康 / 高山种植" value="0蔗糖 / 原产地健康 / 云南高山种植 / 天然坚果风味 / 微果酸">
     </div>
     <div class="field">
-      <label>客户独特之处<span class="opt" style="color:var(--accent);font-weight:600">⭐推荐填写</span></label>
+      <label>
+        客户独特之处
+        <span class="opt rec">⭐推荐</span>
+        <span class="tip">
+          <span class="tip-btn">💡 怎么填</span>
+          <span class="tip-body">
+            <b>这个客户和同品类竞品比，最不一样的地方是什么？</b><br><br>
+            <b>产地</b>：云南本地产 / 内蒙草原 / 岭南深山<br>
+            <b>工艺</b>：非遗工艺 / 冷压萃取 / 家族传承<br>
+            <b>创始人故事</b>：创始人是XX冠军 / 儿科营养师 / 三代茶农<br>
+            <b>文化基因</b>：少数民族文化 / 药食同源 / 地中海饮食<br><br>
+            填了 AI 就有<b>差异化锚点</b>，方案会围绕它展开；不填也能跑（AI 会从品牌名和原料主动推断，并提示回填）。
+          </span>
+        </span>
+      </label>
       <input id="f_culture" type="text" placeholder="例：云南本地产 / 家族茶园 / 非遗工艺 / 创始人故事" value="云南本地产 / 保山普洱德宏产区 / 云南少数民族文化 / 高山小粒咖啡风土">
-      <div class="hint">这个客户和同品类竞品比，最不一样的地方是什么？<b>产地/工艺/创始人故事/文化基因</b>都可以——填了 AI 就有差异化锚点，不填也能跑（AI 会从品牌名和原料推断）。</div>
     </div>
     <div class="field">
-      <label>现有 SKU<span class="req">*</span><span class="opt">多品用 / 分隔，AI 会主动避免重复推荐</span></label>
+      <label>
+        现有 SKU<span class="req">*</span>
+        <span class="tip">
+          <span class="tip-btn">⚠️ 去重逻辑</span>
+          <span class="tip-body">
+            <b>至少填 1 个，多品用 / 分隔（无上限）</b><br><br>
+            AI 会把这些当作「<b>已饱和方向</b>」，推荐时逐条比对：<br>
+            · 口味/形态/场景 与现有 SKU 重合度 &gt;60% → 自动升级维度<br>
+            · 如"客户已有黑咖" → 推"云南花香黑咖"而非"黑咖"<br>
+            · 方案里会显式列出「已避开的方向」
+          </span>
+        </span>
+      </label>
       <input id="f_sku" type="text" placeholder="例：拿铁 / 黑咖 / 燕麦拿铁 / 生椰拿铁" value="拿铁 / 蓝山 / 黑咖 / 卡布 / 西梅 / 燕麦拿铁 / 生椰拿铁（速溶条装+搅拌杯套装）">
-      <div class="hint">⚠️ 至少填 1 个，AI 会把这些当作「已饱和方向」——推荐的口味/形态/场景若与现有 SKU 重合度过高，会自动升级维度或替换方向。</div>
     </div>
     <div class="field">
       <label>现有客单价<span class="req">*</span></label>
@@ -456,7 +535,19 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
       </div>
     </div>
     <div class="field">
-      <label>特别诉求<span class="opt" style="color:var(--accent);font-weight:600">⭐推荐填写</span></label>
+      <label>
+        特别诉求
+        <span class="opt rec">⭐推荐</span>
+        <span class="tip">
+          <span class="tip-btn">💡 作用</span>
+          <span class="tip-body">
+            <b>此字段决定第 3 张营销卡的主题</b>——客户想切入的新场景（允许超越基线报告发散）。<br><br>
+            填了 AI 会重点押这条线；不填也能跑（AI 走通用路径）。<br><br>
+            <b>快捷 chip</b>：<br>
+            🎯 突出产地风土 / 💡 主攻应季场景 / 👑 切入高端礼盒——一键填入
+          </span>
+        </span>
+      </label>
       <input id="f_special" type="text" placeholder="点击下方 chip 一键填入，也可以自己写" value="🎯 突出产地风土">
       <div class="chips">
         <span class="chip gold" data-target="f_special">🎯 突出产地风土</span>
@@ -468,7 +559,6 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
         <span class="chip gold" data-target="f_special">押注健身代餐</span>
         <span class="chip gold" data-target="f_special">出海东南亚市场</span>
       </div>
-      <div class="hint">此字段决定第 3 张营销卡的主题——客户想切入的新场景（超越基线报告、允许发散）。填了 AI 会重点押这条线，不填也能跑（AI 会走通用路径）。</div>
     </div>
     <div class="field">
       <label>价格带定位<span class="req">*</span></label>
@@ -941,6 +1031,19 @@ document.getElementById('f_files').addEventListener('change', async (e) => {
 function escapeHtml(s){
   return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
+
+// === Tip 点击切换（移动端友好） ===
+document.querySelectorAll('.tip').forEach(t => {
+  t.addEventListener('click', e => {
+    e.stopPropagation();
+    // 关掉其他打开的
+    document.querySelectorAll('.tip.open').forEach(o => { if(o !== t) o.classList.remove('open'); });
+    t.classList.toggle('open');
+  });
+});
+document.addEventListener('click', () => {
+  document.querySelectorAll('.tip.open').forEach(o => o.classList.remove('open'));
+});
 
 // === Toast ===
 let toastTimer;
