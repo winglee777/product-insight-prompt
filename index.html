@@ -282,6 +282,26 @@ html,body{
 .btn-ghost{background:transparent;color:var(--mute);font-weight:600}
 .btn-ghost:hover{color:var(--accent)}
 
+/* === EXCEL 批量导入导出工具条 === */
+.excel-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  padding:12px 14px;margin-bottom:20px;
+  background:linear-gradient(135deg,#fdf6e3,#fef3e7);
+  border:1px solid var(--gold);
+  border-left:4px solid var(--gold);
+  border-radius:4px;
+}
+.excel-bar-t{display:flex;align-items:center;gap:10px;min-width:0}
+.excel-bar-icon{font-size:20px;line-height:1}
+.excel-bar-t b{display:block;font-size:13px;color:var(--ink);font-weight:900;line-height:1.3}
+.excel-bar-t span{display:block;font-size:11px;color:var(--mute);margin-top:2px}
+.excel-bar-btns{display:flex;gap:8px;flex-shrink:0}
+.excel-bar-btns .btn{flex:0 0 auto;white-space:nowrap;padding:9px 14px;font-size:12.5px}
+@media (max-width:1024px){
+  .excel-bar{flex-direction:column;align-items:stretch}
+  .excel-bar-btns{flex-wrap:wrap}
+}
+
 /* === RIGHT PANE (PROMPT OUTPUT) === */
 .right-hd{
   display:flex;align-items:center;justify-content:space-between;
@@ -391,6 +411,22 @@ html,body{
 
   <!-- LEFT: FORM -->
   <div class="left">
+
+    <!-- Excel 批量导入导出工具条 -->
+    <div class="excel-bar">
+      <div class="excel-bar-t">
+        <span class="excel-bar-icon">📊</span>
+        <div>
+          <b>批量填表 · Excel 导入导出</b>
+          <span>下载模板（已代填示例）→ 用 Excel 批量填写「填写值」列 → 上传一键回填到左侧表单</span>
+        </div>
+      </div>
+      <div class="excel-bar-btns">
+        <button class="btn btn-second" id="btnExportExcel">⬇ 下载 Excel 模板</button>
+        <button class="btn btn-primary" id="btnImportExcel">⬆ 上传 Excel 回填</button>
+        <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display:none">
+      </div>
+    </div>
 
     <!-- 1. 行业基线报告 -->
     <div class="section-hd">
@@ -759,6 +795,8 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
 </div>
 
 <div class="toast" id="toast">✅ 已复制到剪贴板</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 <script>
 // === 默认示例值（脱敏 · 云南咖啡品牌参考案例） ===
@@ -1263,6 +1301,193 @@ function showToast(msg){
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
 }
+
+// === Excel 批量导入导出 ===
+const EXCEL_FIELDS = [
+  { id:'f_baselines', label:'参考报告网址', required:true, type:'textarea',
+    hint:'一个或多个行业趋势报告网址，多个用换行分隔；AI 会自动访问提取趋势基线',
+    example:'https://winglee777.github.io/q3-category-trend/longimage.html' },
+  { id:'f_manual_data', label:'手动粘贴报告数据', required:false, type:'textarea',
+    hint:'选填；粘贴报告 TOP 爆款表格 / 关键词 / insight 段落',
+    example:'' },
+  { id:'f_brand', label:'品牌名', required:true,
+    hint:'例：客户 A（云南咖啡品牌）',
+    example:'客户 A（云南咖啡品牌）' },
+  { id:'f_stage', label:'品牌阶段', required:true, type:'select',
+    options:['起步期','成长期','成熟期'],
+    hint:'三选一：起步期 / 成长期 / 成熟期',
+    example:'成长期' },
+  { id:'f_material', label:'核心原料', required:true,
+    hint:'1 个主原料',
+    example:'云南小粒咖啡豆' },
+  { id:'f_tags', label:'原料卖点标签', required:true,
+    hint:'3-5 个，用 / 分隔',
+    example:'0蔗糖 / 原产地健康 / 云南高山种植 / 天然坚果风味 / 微果酸' },
+  { id:'f_culture', label:'客户独特之处', required:false,
+    hint:'推荐填；产地 / 工艺 / 创始人故事 / 文化基因',
+    example:'云南本地产 / 保山普洱德宏产区 / 云南少数民族文化 / 高山小粒咖啡风土' },
+  { id:'f_sku', label:'主线产品 SKU', required:true,
+    hint:'已跑通有量的核心产品，多品用 / 分隔',
+    example:'拿铁 / 蓝山 / 黑咖 / 卡布 / 西梅 / 燕麦拿铁 / 生椰拿铁' },
+  { id:'f_sku_sub', label:'待发展产品', required:false,
+    hint:'选填；有但未跑通的副线',
+    example:'' },
+  { id:'f_goal', label:'本次开品核心目标', required:true, type:'radio',
+    options:['主线深耕','副线突破','新品类开拓'],
+    hint:'三选一：主线深耕 / 副线突破 / 新品类开拓',
+    example:'主线深耕' },
+  { id:'f_sub_direction', label:'副线发展方向', required:false, type:'radio',
+    options:['多口味多场景','形态升级','客群迁移','主副线组合联动'],
+    hint:'仅当「开品核心目标」= 副线突破 时需要',
+    example:'多口味多场景' },
+  { id:'f_price', label:'现有客单价', required:true,
+    hint:'例：39.9-89.9 元（下沉囤货带）',
+    example:'39.9-89.9 元（下沉囤货带）' },
+  { id:'f_forms', label:'可拓展形态', required:true,
+    hint:'多形态，用 / 分隔；如 粉剂 / 饮品 / 冻干罐装 / 咖啡糖 / 礼盒组合',
+    example:'粉剂 / 饮品 / 冻干罐装 / 咖啡糖 / 礼盒组合' },
+  { id:'f_limit', label:'产能限制', required:false,
+    hint:'选填',
+    example:'速溶粉产线成熟，自有工厂年产3万吨' },
+  { id:'f_cert', label:'食品安全资质', required:false,
+    hint:'选填',
+    example:'已有 SC，具备糖果生产线' },
+  { id:'f_audience', label:'目标客群', required:true,
+    hint:'可多类，用 / 分隔',
+    example:'25-40 岁女性 / 悦己尝鲜派 / 妈妈群 / 高端白领 / 差旅人群' },
+  { id:'f_special', label:'特别诉求', required:false,
+    hint:'决定第三张营销卡主题',
+    example:'🎯 突出产地风土' },
+  { id:'f_band', label:'价格带定位', required:true, type:'select',
+    options:['性价比','中端','中高端','高端礼品级'],
+    hint:'四选一：性价比 / 中端 / 中高端 / 高端礼品级',
+    example:'中端' },
+  { id:'f_time', label:'规划时间', required:true,
+    hint:'例：26 Q3-Q4 全年',
+    example:'26 Q3-Q4 全年' },
+  { id:'f_budget', label:'预算量级', required:false,
+    hint:'选填',
+    example:'单品研发 30-50 万' },
+  { id:'f_sku_count', label:'SKU 拓品矩阵数量', required:true, type:'number',
+    hint:'5-15，默认 8',
+    example:'10' },
+  { id:'f_p0_count', label:'P0 优先级单品数量', required:true, type:'number',
+    hint:'1-5，默认 2',
+    example:'3' },
+  { id:'f_marketing_count', label:'营销主线数量', required:true, type:'number',
+    hint:'2-5，默认 3',
+    example:'3' },
+  { id:'f_tag_count', label:'三维度标签/榜单条目数量', required:false, type:'number',
+    hint:'5-12，默认 8',
+    example:'8' },
+];
+
+function exportExcel(){
+  if(!window.XLSX){ showToast('❌ Excel 组件未加载，请刷新页面后重试'); return; }
+  const d = collectData();
+  const rows = [['字段名','必填','填写说明','示例','填写值','字段ID（勿删）']];
+  for(const f of EXCEL_FIELDS){
+    const cur = (d[f.id] !== undefined && d[f.id] !== null) ? String(d[f.id]) : '';
+    rows.push([
+      f.label,
+      f.required ? '必填' : '选填',
+      f.hint || '',
+      f.example || '',
+      cur,
+      f.id,
+    ]);
+  }
+  const ws = XLSX.utils.aoa_to_sheet(rows);
+  ws['!cols'] = [{wch:24},{wch:7},{wch:46},{wch:44},{wch:44},{wch:18}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '开品客户信息');
+  XLSX.writeFile(wb, '开品客户信息表.xlsx');
+  showToast('⬇ 已下载模板，请在「填写值」列填写后上传回填');
+}
+
+function importExcel(file){
+  if(!window.XLSX){ showToast('❌ Excel 组件未加载，请刷新页面后重试'); return; }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const wb = XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+      let idCol = -1, valCol = -1;
+      for(let i=0;i<Math.min(rows.length,10);i++){
+        const r = rows[i] || [];
+        let has = false;
+        r.forEach((c,idx)=>{
+          const s = String(c).trim();
+          if(s === '字段ID' || s === '字段ID（勿删）'){ idCol = idx; has = true; }
+          if(s === '填写值'){ valCol = idx; has = true; }
+        });
+        if(has) break;
+      }
+      if(idCol < 0 || valCol < 0){
+        showToast('❌ 未识别到模板表头（需保留「填写值」「字段ID」列），请使用下载的模板');
+        return;
+      }
+      const map = {};
+      for(let i=0;i<rows.length;i++){
+        const r = rows[i] || [];
+        const id = String(r[idCol] || '').trim();
+        if(id && id.indexOf('f_') === 0){
+          const v = r[valCol];
+          map[id] = (v === undefined || v === null) ? '' : String(v).trim();
+        }
+      }
+      applyImport(map);
+    }catch(err){
+      showToast('❌ 解析失败：' + (err && err.message ? err.message : err));
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function applyImport(map){
+  let applied = 0;
+  const skipped = [];
+  for(const f of EXCEL_FIELDS){
+    const val = map[f.id];
+    if(val === undefined || val === '') continue;
+    const el = document.getElementById(f.id);
+    if(!el) continue;
+    if(f.type === 'select'){
+      if(f.options && f.options.indexOf(val) >= 0){ el.value = val; applied++; }
+      else skipped.push(f.label + '（应为：' + f.options.join('/') + '）');
+    } else if(f.type === 'radio'){
+      if(f.options && f.options.indexOf(val) >= 0){
+        const radio = document.querySelector('input[name="' + f.id + '"][value="' + val + '"]');
+        if(radio){ radio.checked = true; radio.dispatchEvent(new Event('change')); applied++; }
+        else skipped.push(f.label);
+      } else {
+        skipped.push(f.label + '（应为：' + f.options.join('/') + '）');
+      }
+    } else if(f.type === 'number'){
+      const n = parseInt(val, 10);
+      if(!isNaN(n)){ el.value = n; applied++; }
+      else skipped.push(f.label);
+    } else {
+      el.value = val;
+      applied++;
+    }
+  }
+  render();
+  let msg = '✅ 已回填 ' + applied + ' 个字段';
+  if(skipped.length) msg += '；跳过 ' + skipped.length + ' 项：' + skipped.join('；');
+  showToast(msg);
+}
+
+document.getElementById('btnExportExcel').addEventListener('click', exportExcel);
+document.getElementById('btnImportExcel').addEventListener('click', () => {
+  document.getElementById('excelFile').click();
+});
+document.getElementById('excelFile').addEventListener('change', (e) => {
+  const f = e.target.files && e.target.files[0];
+  if(f){ importExcel(f); }
+  e.target.value = '';
+});
 
 // === 初始渲染 ===
 initGoalToggle();
