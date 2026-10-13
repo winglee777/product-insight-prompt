@@ -391,7 +391,7 @@ html,body{
   <div class="eyebrow">CUSTOMER PRODUCT INSIGHT · ONE-CLICK GENERATOR</div>
   <h1>商家开品洞察 <span class="h">提示词生成器</span></h1>
   <p class="lead">
-    粘贴<b>任意一份行业趋势报告网址</b>（已内嵌：食品饮料行业 25Q3 / 25Q4 趋势报告）+ 填写客户信息 →
+    粘贴<b>任意一份行业趋势报告网址</b>（已内嵌：<b>26 双11 卖点作战指南</b> + 食品饮料行业 25Q3 / 25Q4 趋势报告）+ 填写客户信息 →
     一键生成专属提示词 → 喂给 <b>任意支持联网的 AI 工具</b>（CodeBuddy / Claude / Codex）→
     得到独家《开品洞察 OnePage》。
     <br>预计耗时 <b>5 分钟</b>。
@@ -445,18 +445,23 @@ html,body{
             · <code>api/data.md</code> — 给 <b>AI agent 兜底</b>的静态文本版（爆款 SKU / 关键词全在里面）<br>
             · 双投递确保任何 AI agent（Claude/GPT/Codex/Gemini）拿到提示词都能正常工作<br>
             <br>
+            <b>🔥 26 双11 卖点作战指南</b>（<code>s11-food-guide</code>）：商品消费专项组出品，数据截至 2026/10/09，按三级类目给出主力 / 放量 / 新兴卖点 + 相对大盘增速 + 价格带，适合双11 开品与素材方向。<br>
+            <br>
             <b>用法</b>：可粘贴任意行业趋势报告网址（视频号小店食饮品类）。不限于本团队产出，也可以是其他赛道（茶饮/美妆/家清等）的趋势报告。多个网址用换行分隔。
           </span>
         </span>
       </label>
-      <textarea id="f_baselines" rows="5" placeholder="粘贴一个或多个行业趋势报告的网址，AI 会自动访问并提取趋势数据作为基线">https://winglee777.github.io/q3-category-trend/longimage.html
+      <textarea id="f_baselines" rows="5" placeholder="粘贴一个或多个行业趋势报告的网址，AI 会自动访问并提取趋势数据作为基线">https://s11-food-guide.app-tencent.workbuddy.host/
+https://winglee777.github.io/q3-category-trend/longimage.html
 https://winglee777.github.io/q3-category-trend/api/data.md
 https://winglee777.github.io/q4-category-trend/longimage.html
 https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
       <div class="chips">
+        <span class="chip" data-baseline="s11_all">🔥 双11 指南 + Q3/Q4（推荐）</span>
+        <span class="chip" data-baseline="s11">🔥 仅 26 双11 卖点指南</span>
         <span class="chip" data-baseline="q3">📊 仅 25Q3 报告</span>
         <span class="chip" data-baseline="q4">📊 仅 25Q4 报告</span>
-        <span class="chip" data-baseline="both">📊 Q3 + Q4 双季（推荐）</span>
+        <span class="chip" data-baseline="both">📊 Q3 + Q4 双季</span>
         <span class="chip" data-baseline="ai_only">🤖 仅 AI 兜底版（最稳）</span>
       </div>
     </div>
@@ -789,7 +794,7 @@ https://winglee777.github.io/q4-category-trend/api/data.md</textarea>
 
 <div class="footer">
   <span class="brand">Customer Product Insight Generator V1.3 · 差异化拓品版</span> ·
-  数据基线：视频号小店 25Q3+Q4 实证（2025-07-01 — 2025-12-31）·
+  数据基线：26 双11 卖点作战指南（截至 2026-10-09）+ 视频号小店 25Q3+Q4 实证（2025-07-01 — 2025-12-31）·
   <span style="color:var(--accent);font-weight:700">2026.07</span>
   <br><span style="font-size:11px;color:var(--mute)">⚡ V1.3 升级：客户独特之处锚定 + 现有 SKU 禁区去重 + web_search 三铁律 + 本地文件上传 + 软校验弹窗，解决"不同客户跑出雷同方案"问题</span>
 </div>
@@ -806,9 +811,12 @@ const BASELINE_PRESETS = {
   both: 'https://winglee777.github.io/q3-category-trend/longimage.html\nhttps://winglee777.github.io/q3-category-trend/api/data.md\nhttps://winglee777.github.io/q4-category-trend/longimage.html\nhttps://winglee777.github.io/q4-category-trend/api/data.md',
   ai_only: 'https://winglee777.github.io/q3-category-trend/api/data.md\nhttps://winglee777.github.io/q4-category-trend/api/data.md',
 };
+const S11_URL = 'https://s11-food-guide.app-tencent.workbuddy.host/';
+BASELINE_PRESETS.s11 = S11_URL;
+BASELINE_PRESETS.s11_all = S11_URL + '\n' + BASELINE_PRESETS.both;
 
 const DEFAULTS = {
-  f_baselines: BASELINE_PRESETS.both,
+  f_baselines: BASELINE_PRESETS.s11_all,
   f_manual_data: '',
   f_brand: '客户 A（云南咖啡品牌）',
   f_stage: '成长期',
@@ -877,6 +885,23 @@ ${subSkuLine}
   const urlList = urls.map((u, i) => `  ${i+1}. ${u}`).join('\n');
   const urlCount = urls.length;
 
+  // 26 双11 卖点作战指南：数据内嵌在页面 JS 里，需要专门的读取说明
+  const hasS11 = urls.some(u => u.indexOf('s11-food-guide') >= 0);
+  const s11Part = hasS11 ? `
+
+📌 关于「26 双11 卖点作战指南 · 食品饮料」（${S11_URL}）的专门说明：
+- 出品：商品消费专项组；数据截至 2026/10/09；口径 =「节后两周 vs 中秋前两周」的广告花费变化，并**扣除大盘整体涨跌**（相对大盘增速 rel）；对外版已隐去金额，**没有 GMV 绝对值**
+- 页面是单个 HTML，**所有颗粒数据都内嵌在 <script> 里的 \`const D = {...}\` JSON 中**（约 2MB）。普通网页抓取转 Markdown 只能拿到约 2000 字的骨架说明文字，**拿不到卖点/商品颗粒**。请用能返回原始 HTML 的方式读取（如 curl / 原始源码），解析 \`const D\`；该站点**没有** api/data.md 兜底
+- \`const D\` 关键字段：
+  · \`cats[]\`：每个三级类目一行（c2/c3、share 花费占比、rel 相对大盘增速、shape 走势形态），含 \`main\` 主力卖点 Top5（定基本盘）/ \`rise\` 放量卖点 Top5（定双11 新素材方向）/ \`emerg\` 新兴卖点 Top5（定测款方向）/ \`crowd\` 人群 / \`scene\` 场景 / \`promo\` 促销钩子 / \`pq\` 价格分位
+  · \`tags[]\`：卖点/人群/场景/促销钩子/权益/明星IP/节点 标签明细（g 分组、v 标签名、c3 类目、rel、shape、ws 5 周走势）
+  · \`drill\`：键为「三级类目||卖点」，值为该卖点下花费最高的具体商品名（kind = up 增长 / new 新上）
+  · \`names[]\`：商品名称关键词趋势（dim 维度、kw 关键词、rel、eg 示例商品），用于交叉验证卖点，也直接回答「双11 标题该写什么词」
+  · \`pb_chg\` / \`price_w\`：价格带花费占比与变化（P25/中位数/P75）
+  · shape 取值：up 持续走强 / new 新起量 / rebound 节后回暖 / flat 平稳 / peak 冲高回落 / down 持续走弱
+- 引用这份报告时，对位锚点写成「对位 双11 指南 · {三级类目} · 放量卖点「{卖点}」相对大盘 +{rel}%」或「对位 双11 指南 · drill 商品《{商品名}》」，**不得编造 GMV 数字**
+- 优先使用与客户核心原料/品类最接近的三级类目；双11 规划优先押「放量卖点 + 名称关键词双口径都跑赢」的方向（确定性最高），「新兴卖点」用于小额测款` : '';
+
   // 手动粘贴数据（兜底中的兜底）：当 AI 无法联网或网址失效时直接用文本
   const manualData = (d.f_manual_data || '').trim();
   const manualPart = manualData
@@ -917,12 +942,12 @@ ${urlList}
       · 核心 insight 笔记
 3. **如果连 api/data.md 也访问不到**：在输出最开头明确声明"基线数据未能获取"，并请用户：
    ① 把报告网页里的 TOP 爆款数据直接复制粘贴给你；
-   ② 或检查网址是否可访问。**绝不允许用通用知识库猜测数据填充。**
+   ② 或检查网址是否可访问。**绝不允许用通用知识库猜测数据填充。**${s11Part}
 
 要求：
 - 必须先抓取并阅读上述网址内容，提取其中的品类大盘数据、时令节点、爆款单品、口味/场景/工艺关键词等关键信息
 - 后续所有趋势引用、单品对位锚点、数据支撑必须来自这些报告，不得凭知识库编造
-- 在每个引用具体爆款 / GMV 数字的地方，标注数据出处（如"对位 Q4 报告 · 国联水产广式水晶虾饺 191w"）${manualPart}${uploadedPart}
+- 在每个引用具体爆款 / GMV 数字 / 卖点增速的地方，标注数据出处（如"对位 Q4 报告 · 国联水产广式水晶虾饺 191w"${hasS11 ? '、"对位 双11 指南 · 冲饮品/食补粉 · 放量卖点「核桃」相对大盘 +442.6%"' : ''}）${manualPart}${uploadedPart}
 
 【输入 2 · 客户信息】
 ${customerInfo}
@@ -934,7 +959,7 @@ ${customerInfo}
 
 # 段 1：HERO 区
 - 大标题："${d.f_brand} · 拓品参考"+副标题（基于客户原料的核心心智 1 句话）
-- 一段 lead 文案：用 25Q3+Q4 数据点 + 客户原料标签，引出"原料基底不变 → 三维拓品"的核心方法论
+- 一段 lead 文案：用基线报告数据点（${hasS11 ? '双11 指南的放量/新兴卖点 + ' : ''}25Q3+Q4 数据）+ 客户原料标签，引出"原料基底不变 → 三维拓品"的核心方法论
 - 4 个关键 meta：基底原料 / 现有产品 / 核心标签 / 机会窗口
 
 # 段 2：拓品三维度（口味 × 场景 × 形态）
@@ -1306,7 +1331,7 @@ function showToast(msg){
 const EXCEL_FIELDS = [
   { id:'f_baselines', label:'参考报告网址', required:true, type:'textarea',
     hint:'一个或多个行业趋势报告网址，多个用换行分隔；AI 会自动访问提取趋势基线',
-    example:'https://winglee777.github.io/q3-category-trend/longimage.html' },
+    example:'https://s11-food-guide.app-tencent.workbuddy.host/' },
   { id:'f_manual_data', label:'手动粘贴报告数据', required:false, type:'textarea',
     hint:'选填；粘贴报告 TOP 爆款表格 / 关键词 / insight 段落',
     example:'' },
